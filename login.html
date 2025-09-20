@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - ES1 Class</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h2>Admin Login</h2>
+                <p>Access the ES1 Class management system</p>
+            </div>
+            
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            </form>
+            
+            <div class="login-links">
+                <a href="index.html">← Back to Home</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Demo Credentials Info -->
+    <div style="position: fixed; bottom: 20px; left: 20px; background: #f8f9fa; padding: 1rem; border-radius: 8px; border: 1px solid #e9ecef; max-width: 300px;">
+        <h4 style="margin: 0 0 0.5rem 0; color: #000;">Demo Credentials:</h4>
+        <p style="margin: 0; font-size: 0.9rem; color: #666;">
+            <strong>Admin:</strong> admin / admin123<br>
+            <strong>Teacher:</strong> teacher / teacher123
+        </p>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Enhanced login handling with real API
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            console.log('Attempting login for user:', username);
+            
+            try {
+                const response = await fetch(getApiUrl('/login'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                console.log('Login response status:', response.status);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Login successful, storing tokens:', {
+                        hasToken: !!data.token,
+                        role: data.role,
+                        username: data.username
+                    });
+                    
+                    // Clear any existing tokens first
+                    localStorage.removeItem('userToken');
+                    localStorage.removeItem('userRole');
+                    localStorage.removeItem('username');
+                    
+                    // Store new tokens
+                    localStorage.setItem('userToken', data.token);
+                    localStorage.setItem('userRole', data.role);
+                    localStorage.setItem('username', data.username);
+                    
+                    // Verify tokens were stored
+                    console.log('Tokens stored:', {
+                        token: localStorage.getItem('userToken') ? 'Present' : 'Missing',
+                        role: localStorage.getItem('userRole'),
+                        username: localStorage.getItem('username')
+                    });
+                    
+                    showNotification('Login successful!', 'success');
+                    
+                    setTimeout(() => {
+                        window.location.href = 'admin.html';
+                    }, 1000);
+                    
+                } else {
+                    const errorData = await response.json();
+                    console.error('Login failed:', errorData);
+                    showNotification(errorData.message || 'Invalid credentials', 'error');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showNotification('Login failed. Please try again.', 'error');
+            }
+        });
+    </script>
+</body>
+</html>
