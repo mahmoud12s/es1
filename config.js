@@ -11,13 +11,12 @@ const CONFIG = {
             return 'http://localhost:2092/api';
         }
         
-        // Production - Use HTTP since your backend is HTTP
-        // Note: You may need to allow mixed content in browser
-        return 'http://earth.bssr-nodes.com:2092/api';
+        // Production - Railway HTTPS backend (no mixed content issues!)
+        return 'https://serverjs-production-0592.up.railway.app/api';
     })(),
     
-    // Alternative HTTPS URL (if you enable HTTPS on backend)
-    HTTPS_API_URL: 'https://earth.bssr-nodes.com:2092/api',
+    // Railway backend URL (HTTPS enabled)
+    RAILWAY_API_URL: 'https://serverjs-production-0592.up.railway.app/api',
     
     // Application Settings
     APP_NAME: 'ES1 Class Organization',
