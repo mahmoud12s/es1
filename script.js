@@ -219,10 +219,35 @@ function initSubjectDetailPage() {
     }
 }
 
-// API Helper function
+// API Helper function with fallback for mixed content issues
 function getApiUrl(endpoint) {
     const baseUrl = window.CONFIG ? window.CONFIG.API_BASE_URL : 'http://localhost:3000/api';
     return `${baseUrl}${endpoint}`;
+}
+
+// Enhanced fetch with fallback for mixed content
+async function fetchWithFallback(endpoint, options = {}) {
+    const primaryUrl = getApiUrl(endpoint);
+    
+    try {
+        console.log('Attempting API call to:', primaryUrl);
+        const response = await fetch(primaryUrl, options);
+        return response;
+    } catch (error) {
+        console.warn('Primary API call failed:', error.message);
+        
+        // If we're on HTTPS and the error might be mixed content, try fallback
+        if (window.location.protocol === 'https:' && window.CONFIG && window.CONFIG.FALLBACK_API_URL) {
+            console.log('Trying fallback URL due to potential mixed content issue');
+            showNotification('Note: Using HTTP backend may require allowing mixed content in your browser', 'info');
+            
+            const fallbackUrl = `${window.CONFIG.FALLBACK_API_URL}${endpoint}`;
+            console.log('Fallback API call to:', fallbackUrl);
+            return await fetch(fallbackUrl, options);
+        }
+        
+        throw error;
+    }
 }
 
 // Load schedule from API
@@ -447,9 +472,11 @@ async function handleLogin(event) {
     const username = formData.get('username');
     const password = formData.get('password');
     
+    console.log('Attempting login for user:', username);
+    
     try {
-        // This would typically make an API call to your backend
-        const response = await fetch(getApiUrl('/login'), {
+        // Enhanced API call with fallback for mixed content issues
+        const response = await fetchWithFallback('/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -457,24 +484,42 @@ async function handleLogin(event) {
             body: JSON.stringify({ username, password })
         });
         
+        console.log('Login response status:', response.status);
+        
         if (response.ok) {
             const data = await response.json();
+            console.log('Login successful:', data);
+            
             localStorage.setItem('userToken', data.token);
             localStorage.setItem('userRole', data.role);
+            localStorage.setItem('username', data.username);
+            
             showNotification('Login successful!', 'success');
             
             // Redirect based on role
-            if (data.role === 'admin') {
-                window.location.href = 'admin.html';
-            } else {
-                window.location.href = 'index.html';
-            }
+            setTimeout(() => {
+                if (data.role === 'admin' || data.role === 'teacher') {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'index.html';
+                }
+            }, 1000);
         } else {
-            showNotification('Invalid credentials', 'error');
+            const errorData = await response.json().catch(() => ({ message: 'Invalid credentials' }));
+            console.error('Login failed:', errorData);
+            showNotification(errorData.message || 'Invalid credentials', 'error');
         }
     } catch (error) {
         console.error('Login error:', error);
-        showNotification('Login failed. Please try again.', 'error');
+        
+        // Provide more specific error messages
+        if (error.message.includes('Mixed Content') || error.message.includes('blocked')) {
+            showNotification('Connection blocked by browser security. Please enable mixed content or use HTTPS backend.', 'error');
+        } else if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
+            showNotification('Cannot connect to server. Please check if the backend is running.', 'error');
+        } else {
+            showNotification('Login failed. Please try again.', 'error');
+        }
     }
 }
 
