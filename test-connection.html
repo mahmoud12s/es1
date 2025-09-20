@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backend Connection Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button { background-color: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px; }
+        button:hover { background-color: #0056b3; }
+        pre { background-color: #f8f9fa; padding: 10px; border-radius: 5px; overflow-x: auto; }
+    </style>
+    <script src="config.js"></script>
+</head>
+<body>
+    <h1>Backend Connection Test</h1>
+    <p>This page helps diagnose connection issues between your frontend and backend.</p>
+    
+    <div id="results"></div>
+    
+    <button onclick="testHealthEndpoint()">Test Health Endpoint</button>
+    <button onclick="testLogin()">Test Login</button>
+    <button onclick="clearResults()">Clear Results</button>
+    
+    <h3>Current Configuration:</h3>
+    <pre id="config"></pre>
+    
+    <h3>Instructions:</h3>
+    <div class="info test-result">
+        <strong>Mixed Content Issue:</strong> If you're seeing connection failures, it's likely because your HTTPS frontend cannot connect to an HTTP backend. 
+        <br><br>
+        <strong>Solutions:</strong>
+        <ol>
+            <li><strong>Enable HTTPS on your backend</strong> (recommended)</li>
+            <li><strong>Allow mixed content in browser:</strong> 
+                <ul>
+                    <li>Chrome: Click the shield icon in address bar → "Load unsafe scripts"</li>
+                    <li>Firefox: Click the shield icon → "Disable protection for now"</li>
+                </ul>
+            </li>
+            <li><strong>Test locally:</strong> Access your frontend via HTTP instead of HTTPS</li>
+        </ol>
+    </div>
+
+    <script>
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+            results.appendChild(div);
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        async function testHealthEndpoint() {
+            addResult('Testing health endpoint...', 'info');
+            
+            const urls = [
+                'https://earth.bssr-nodes.com:2092/api/health',
+                'http://earth.bssr-nodes.com:2092/api/health'
+            ];
+            
+            for (const url of urls) {
+                try {
+                    addResult(`Trying: ${url}`, 'info');
+                    const response = await fetch(url);
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        addResult(`✅ SUCCESS: ${url} - ${JSON.stringify(data)}`, 'success');
+                        return;
+                    } else {
+                        addResult(`❌ HTTP Error ${response.status}: ${url}`, 'error');
+                    }
+                } catch (error) {
+                    addResult(`❌ Network Error: ${url} - ${error.message}`, 'error');
+                }
+            }
+        }
+        
+        async function testLogin() {
+            addResult('Testing login endpoint...', 'info');
+            
+            const urls = [
+                'https://earth.bssr-nodes.com:2092/api/login',
+                'http://earth.bssr-nodes.com:2092/api/login'
+            ];
+            
+            for (const url of urls) {
+                try {
+                    addResult(`Trying login: ${url}`, 'info');
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            username: 'admin',
+                            password: 'admin123'
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        addResult(`✅ LOGIN SUCCESS: ${url} - Role: ${data.role}`, 'success');
+                        return;
+                    } else {
+                        addResult(`❌ Login failed: ${url} - ${data.message}`, 'error');
+                    }
+                } catch (error) {
+                    addResult(`❌ Login network error: ${url} - ${error.message}`, 'error');
+                }
+            }
+        }
+        
+        // Display current configuration
+        document.addEventListener('DOMContentLoaded', function() {
+            const configElement = document.getElementById('config');
+            configElement.textContent = JSON.stringify({
+                'Current Protocol': window.location.protocol,
+                'Current Hostname': window.location.hostname,
+                'API Base URL': window.CONFIG ? window.CONFIG.API_BASE_URL : 'CONFIG not loaded',
+                'Fallback URL': window.CONFIG ? window.CONFIG.FALLBACK_API_URL : 'Not available'
+            }, null, 2);
+        });
+    </script>
+</body>
+</html>
