@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ES1 Class Organization</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2>ES1 Class</h2>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#home" class="nav-link active">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#schedule" class="nav-link">Weekly Program</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#subjects" class="nav-link">Subjects</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#agenda" class="nav-link">Agenda</a>
+                </li>
+                <li class="nav-item">
+                    <a href="login.html" class="nav-link">Admin Login</a>
+                </li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>Welcome to ES1 Class Organization</h1>
+            <p>Your complete learning management system</p>
+            <div class="hero-buttons">
+                <a href="#schedule" class="btn btn-primary">View Schedule</a>
+                <a href="#subjects" class="btn btn-secondary">Browse Subjects</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Weekly Program Section -->
+    <section id="schedule" class="schedule-section">
+        <div class="container">
+            <h2 class="section-title">Weekly Program</h2>
+            <div class="schedule-grid" id="scheduleContainer">
+                <!-- Schedule will be loaded dynamically from database -->
+                <div class="empty-message" style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: #666;">
+                    <i class="fas fa-calendar-alt" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                    <p>No schedule available yet. Admin can add classes through the admin panel.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Subjects Section -->
+    <section id="subjects" class="subjects-section">
+        <div class="container">
+            <h2 class="section-title">Subjects</h2>
+            <div class="subjects-grid" id="subjectsContainer">
+                <!-- Subjects will be loaded dynamically from database -->
+                <div class="empty-message" style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: #666;">
+                    <i class="fas fa-book-open" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                    <p>No subjects available yet. Admin can add subjects through the admin panel.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Homework Agenda Section -->
+    <section id="agenda" class="agenda-section">
+        <div class="container">
+            <h2 class="section-title">Homework Agenda</h2>
+            <div class="agenda-grid" id="agendaContainer">
+                <!-- Homework assignments will be loaded dynamically from database -->
+                <div class="empty-message" style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: #666;">
+                    <i class="fas fa-tasks" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                    <p>No homework assignments available yet. Admin can add homework through the admin panel.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 ES1 Class Organization. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

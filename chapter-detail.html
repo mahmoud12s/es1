@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter Details - ES1 Class</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="config.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2>ES1 Class</h2>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="index.html#schedule" class="nav-link">Weekly Program</a>
+                </li>
+                <li class="nav-item">
+                    <a href="index.html#subjects" class="nav-link">Subjects</a>
+                </li>
+                <li class="nav-item">
+                    <a href="index.html#agenda" class="nav-link">Agenda</a>
+                </li>
+                <li class="nav-item">
+                    <a href="login.html" class="nav-link">Admin Login</a>
+                </li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <div class="container">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><i class="fas fa-chevron-right"></i></li>
+                <li><a href="index.html#subjects">Subjects</a></li>
+                <li><i class="fas fa-chevron-right"></i></li>
+                <li><a href="#" id="subjectLink">Subject</a></li>
+                <li><i class="fas fa-chevron-right"></i></li>
+                <li id="currentChapter">Chapter</li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Chapter Detail Section -->
+    <section class="subject-detail">
+        <div class="container">
+            <div class="subject-header">
+                <h1 id="chapterTitle">Chapter Name</h1>
+                <p id="chapterDescription">Chapter description will be loaded here</p>
+                
+                <!-- Chapter Progress -->
+                <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin: 2rem 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <span style="font-weight: 600;">Progress</span>
+                        <span id="progressText">0% Complete</span>
+                    </div>
+                    <div style="width: 100%; height: 8px; background: #e9ecef; border-radius: 4px; overflow: hidden;">
+                        <div id="progressBar" style="height: 100%; background: #000; width: 0%; transition: width 0.3s ease;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chapter Stats -->
+            <div class="subject-stats" style="display: flex; justify-content: center; gap: 3rem; margin-bottom: 3rem; flex-wrap: wrap;">
+                <div style="text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 8px; min-width: 150px;">
+                    <div style="font-size: 2rem; font-weight: 700; color: #000;" id="totalLessons">0</div>
+                    <div style="color: #666;">Total Lessons</div>
+                </div>
+                <div style="text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 8px; min-width: 150px;">
+                    <div style="font-size: 2rem; font-weight: 700; color: #000;" id="completedLessons">0</div>
+                    <div style="color: #666;">Completed</div>
+                </div>
+                <div style="text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 8px; min-width: 150px;">
+                    <div style="font-size: 2rem; font-weight: 700; color: #000;" id="estimatedTime">0</div>
+                    <div style="color: #666;">Hours</div>
+                </div>
+            </div>
+
+            <!-- Lessons List -->
+            <h2 style="text-align: center; margin-bottom: 2rem; color: #000;">Lessons</h2>
+            <div id="lessonsContainer" style="max-width: 800px; margin: 0 auto;">
+                <!-- Lessons will be dynamically loaded here -->
+            </div>
+
+            <!-- Chapter Navigation -->
+            <div style="display: flex; justify-content: space-between; margin-top: 3rem; flex-wrap: wrap; gap: 1rem;">
+                <button id="prevChapter" onclick="navigateChapter('prev')" class="btn btn-secondary" style="display: none;">
+                    <i class="fas fa-chevron-left"></i> Previous Chapter
+                </button>
+                <button id="nextChapter" onclick="navigateChapter('next')" class="btn btn-primary" style="display: none;">
+                    Next Chapter <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 ES1 Class Organization. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        let currentSubject, currentChapter, subjectData, chapterData;
+
+        // Load chapter details when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            currentSubject = urlParams.get('subject');
+            currentChapter = parseInt(urlParams.get('chapter'));
+            
+            if (currentSubject && currentChapter) {
+                loadChapterDetails(currentSubject, currentChapter);
+            } else {
+                // Redirect to subjects if no chapter specified
+                window.location.href = 'index.html#subjects';
+            }
+        });
+
+        async function loadChapterDetails(subject, chapterId) {
+            try {
+                const response = await fetch(`/api/subjects/${subject}`);
+                
+                if (!response.ok) {
+                    showNotification('Subject not found', 'error');
+                    setTimeout(() => {
+                        window.location.href = 'index.html#subjects';
+                    }, 2000);
+                    return;
+                }
+                
+                subjectData = await response.json();
+
+                chapterData = subjectData.chapters.find(ch => ch._id === chapterId);
+                
+                if (!chapterData) {
+                    showNotification('Chapter not found', 'error');
+                    setTimeout(() => {
+                        window.location.href = `subject-detail.html?subject=${subject}`;
+                    }, 2000);
+                    return;
+                }
+
+                // Update page content
+                updatePageContent(subject, chapterData);
+                
+                // Generate lessons
+                generateLessons(chapterData);
+                
+                // Setup navigation
+                setupChapterNavigation(subject, chapterId);
+                
+            } catch (error) {
+                console.error('Error loading chapter details:', error);
+                showNotification('Error loading chapter details', 'error');
+                setTimeout(() => {
+                    window.location.href = 'index.html#subjects';
+                }, 2000);
+            }
+        }
+
+        function updatePageContent(subject, chapter) {
+            document.title = `${chapter.title} - ${subjectData.name} - ES1 Class`;
+            document.getElementById('chapterTitle').textContent = chapter.title;
+            document.getElementById('chapterDescription').textContent = chapter.description;
+            document.getElementById('currentChapter').textContent = chapter.title;
+            
+            // Update breadcrumb
+            const subjectLink = document.getElementById('subjectLink');
+            subjectLink.textContent = subjectData.name;
+            subjectLink.href = `subject-detail.html?subject=${subject}`;
+            
+            // Update stats
+            const estimatedHours = Math.ceil(chapter.lessons * 1.5); // 1.5 hours per lesson
+            document.getElementById('totalLessons').textContent = chapter.lessons;
+            document.getElementById('estimatedTime').textContent = estimatedHours;
+            
+            // Mock progress data
+            const completed = Math.floor(Math.random() * chapter.lessons);
+            const progress = Math.floor((completed / chapter.lessons) * 100);
+            
+            document.getElementById('completedLessons').textContent = completed;
+            document.getElementById('progressText').textContent = `${progress}% Complete`;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+        }
+
+        function generateLessons(chapter) {
+            const container = document.getElementById('lessonsContainer');
+            container.innerHTML = '';
+
+            // Generate lesson topics based on chapter
+            const lessonTopics = generateLessonTopics(chapter);
+            
+            lessonTopics.forEach((topic, index) => {
+                const isCompleted = Math.random() > 0.6; // Random completion status
+                const isLocked = index > 0 && !lessonTopics[index - 1].completed && Math.random() > 0.3;
+                
+                const lessonCard = document.createElement('div');
+                lessonCard.className = 'lesson-card';
+                lessonCard.style.cssText = `
+                    background: ${isCompleted ? '#f0f8f0' : '#ffffff'};
+                    border: 1px solid ${isCompleted ? '#28a745' : '#e9ecef'};
+                    border-radius: 8px;
+                    padding: 1.5rem;
+                    margin-bottom: 1rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 1rem;
+                    cursor: ${isLocked ? 'not-allowed' : 'pointer'};
+                    opacity: ${isLocked ? '0.6' : '1'};
+                    transition: all 0.3s ease;
+                `;
+                
+                if (!isLocked) {
+                    lessonCard.addEventListener('mouseenter', function() {
+                        this.style.transform = 'translateY(-2px)';
+                        this.style.boxShadow = '0 4px 15px rgba(0,0,0,0.1)';
+                    });
+                    
+                    lessonCard.addEventListener('mouseleave', function() {
+                        this.style.transform = 'translateY(0)';
+                        this.style.boxShadow = 'none';
+                    });
+                }
+                
+                const statusIcon = isLocked ? 'fa-lock' : isCompleted ? 'fa-check-circle' : 'fa-play-circle';
+                const statusColor = isLocked ? '#6c757d' : isCompleted ? '#28a745' : '#000000';
+                
+                lessonCard.innerHTML = `
+                    <div style="font-size: 1.5rem; color: ${statusColor};">
+                        <i class="fas ${statusIcon}"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <h4 style="margin: 0 0 0.5rem 0; color: #000;">Lesson ${index + 1}: ${topic.title}</h4>
+                        <p style="margin: 0; color: #666; font-size: 0.9rem;">${topic.description}</p>
+                        <div style="margin-top: 0.5rem; font-size: 0.8rem; color: #888;">
+                            <span><i class="fas fa-clock"></i> ${topic.duration}</span>
+                            ${topic.type ? `<span style="margin-left: 1rem;"><i class="fas fa-tag"></i> ${topic.type}</span>` : ''}
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        ${!isLocked ? `<button onclick="startLesson(${index + 1}, '${topic.title}')" class="btn btn-${isCompleted ? 'secondary' : 'primary'}" style="padding: 0.5rem 1rem;">
+                            ${isCompleted ? 'Review' : 'Start'}
+                        </button>` : ''}
+                    </div>
+                `;
+                
+                container.appendChild(lessonCard);
+                
+                // Store completion status
+                topic.completed = isCompleted;
+            });
+        }
+
+        function generateLessonTopics(chapter) {
+            const lessonTemplates = {
+                'Basic Algebra': [
+                    { title: 'Introduction to Variables', description: 'Understanding algebraic variables and expressions', duration: '45 min', type: 'Theory' },
+                    { title: 'Algebraic Operations', description: 'Addition and subtraction with variables', duration: '50 min', type: 'Practice' },
+                    { title: 'Simplifying Expressions', description: 'Combining like terms and simplification', duration: '40 min', type: 'Practice' },
+                    { title: 'Basic Equation Solving', description: 'Solving simple algebraic equations', duration: '55 min', type: 'Problem Solving' },
+                    { title: 'Word Problems', description: 'Translating real-world problems to algebra', duration: '60 min', type: 'Application' },
+                    { title: 'Practice Test', description: 'Assessment of basic algebra concepts', duration: '45 min', type: 'Assessment' },
+                    { title: 'Review Session', description: 'Review and clarification of concepts', duration: '40 min', type: 'Review' },
+                    { title: 'Advanced Applications', description: 'Complex algebraic problem solving', duration: '50 min', type: 'Advanced' }
+                ],
+                'Mechanics': [
+                    { title: 'Introduction to Motion', description: 'Position, velocity, and acceleration', duration: '50 min', type: 'Theory' },
+                    { title: 'Newton\'s First Law', description: 'Law of inertia and its applications', duration: '45 min', type: 'Theory' },
+                    { title: 'Newton\'s Second Law', description: 'Force equals mass times acceleration', duration: '55 min', type: 'Theory' },
+                    { title: 'Newton\'s Third Law', description: 'Action and reaction forces', duration: '40 min', type: 'Theory' },
+                    { title: 'Force Diagrams', description: 'Drawing and analyzing force diagrams', duration: '60 min', type: 'Practice' },
+                    { title: 'Work and Energy', description: 'Kinetic and potential energy concepts', duration: '50 min', type: 'Theory' },
+                    { title: 'Conservation of Energy', description: 'Energy conservation in physical systems', duration: '55 min', type: 'Application' },
+                    { title: 'Momentum', description: 'Linear momentum and collisions', duration: '45 min', type: 'Theory' },
+                    { title: 'Lab: Motion Analysis', description: 'Experimental study of motion', duration: '90 min', type: 'Lab' },
+                    { title: 'Problem Solving Session', description: 'Complex mechanics problems', duration: '60 min', type: 'Problem Solving' },
+                    { title: 'Review and Test Prep', description: 'Comprehensive review session', duration: '50 min', type: 'Review' },
+                    { title: 'Chapter Assessment', description: 'Mechanics chapter test', duration: '75 min', type: 'Assessment' }
+                ]
+            };
+            
+            // Default generic lessons if specific template not found
+            const defaultLessons = [];
+            for (let i = 1; i <= chapter.lessons; i++) {
+                defaultLessons.push({
+                    title: `Topic ${i}`,
+                    description: `Detailed study of ${chapter.title.toLowerCase()} concepts`,
+                    duration: '45-60 min',
+                    type: i % 4 === 0 ? 'Assessment' : i % 3 === 0 ? 'Practice' : 'Theory'
+                });
+            }
+            
+            return lessonTemplates[chapter.title] || defaultLessons;
+        }
+
+        function setupChapterNavigation(subject, chapterId) {
+            const currentIndex = subjectData.chapters.findIndex(ch => ch._id === chapterId);
+            
+            // Previous chapter button
+            if (currentIndex > 0) {
+                const prevChapter = subjectData.chapters[currentIndex - 1];
+                const prevButton = document.getElementById('prevChapter');
+                prevButton.style.display = 'block';
+                prevButton.onclick = () => navigateChapter('prev');
+            }
+            
+            // Next chapter button
+            if (currentIndex < subjectData.chapters.length - 1) {
+                const nextChapter = subjectData.chapters[currentIndex + 1];
+                const nextButton = document.getElementById('nextChapter');
+                nextButton.style.display = 'block';
+                nextButton.onclick = () => navigateChapter('next');
+            }
+        }
+
+        function navigateChapter(direction) {
+            const currentIndex = subjectData.chapters.findIndex(ch => ch._id === currentChapter);
+            let newIndex;
+            
+            if (direction === 'prev' && currentIndex > 0) {
+                newIndex = currentIndex - 1;
+            } else if (direction === 'next' && currentIndex < subjectData.chapters.length - 1) {
+                newIndex = currentIndex + 1;
+            }
+            
+            if (newIndex !== undefined) {
+                const newChapter = subjectData.chapters[newIndex];
+                window.location.href = `chapter-detail.html?subject=${currentSubject}&chapter=${newChapter._id}`;
+            }
+        }
+
+        function startLesson(lessonNumber, lessonTitle) {
+            showNotification(`Starting ${lessonTitle}...`, 'info');
+            
+            // In a real application, this would navigate to a lesson player or content page
+            setTimeout(() => {
+                showNotification('Lesson content would be displayed here in a full implementation', 'info');
+            }, 1000);
+        }
+
+        // Enhanced subject data function (same as in subject-detail.html)
+        function getSubjectData(subject) {
+            const subjects = {
+                mathematics: {
+                    name: 'Mathematics',
+                    description: 'Complete mathematics curriculum covering algebra, geometry, calculus, and advanced mathematical concepts',
+                    chapters: [
+                        {
+                            id: 1,
+                            title: 'Basic Algebra',
+                            description: 'Introduction to algebraic expressions, variables, and basic equation solving',
+                            lessons: 8,
+                            duration: '2 weeks'
+                        },
+                        {
+                            id: 2,
+                            title: 'Linear Equations',
+                            description: 'Solving linear equations, systems of equations, and graphing linear functions',
+                            lessons: 6,
+                            duration: '1.5 weeks'
+                        },
+                        {
+                            id: 3,
+                            title: 'Quadratic Equations',
+                            description: 'Working with quadratic functions, factoring, and the quadratic formula',
+                            lessons: 10,
+                            duration: '2.5 weeks'
+                        },
+                        {
+                            id: 4,
+                            title: 'Geometry Basics',
+                            description: 'Points, lines, angles, triangles, and basic geometric proofs',
+                            lessons: 12,
+                            duration: '3 weeks'
+                        },
+                        {
+                            id: 5,
+                            title: 'Trigonometry',
+                            description: 'Sine, cosine, tangent functions and their real-world applications',
+                            lessons: 15,
+                            duration: '3.5 weeks'
+                        }
+                    ]
+                },
+                physics: {
+                    name: 'Physics',
+                    description: 'Comprehensive physics course covering mechanics, thermodynamics, waves, and modern physics',
+                    chapters: [
+                        {
+                            id: 1,
+                            title: 'Mechanics',
+                            description: 'Motion, forces, Newton\'s laws, and energy conservation',
+                            lessons: 12,
+                            duration: '3 weeks'
+                        },
+                        {
+                            id: 2,
+                            title: 'Thermodynamics',
+                            description: 'Heat, temperature, thermal energy, and the laws of thermodynamics',
+                            lessons: 8,
+                            duration: '2 weeks'
+                        },
+                        {
+                            id: 3,
+                            title: 'Waves and Sound',
+                            description: 'Wave properties, sound waves, and acoustic phenomena',
+                            lessons: 10,
+                            duration: '2.5 weeks'
+                        },
+                        {
+                            id: 4,
+                            title: 'Optics',
+                            description: 'Light, reflection, refraction, lenses, and optical instruments',
+                            lessons: 8,
+                            duration: '2 weeks'
+                        }
+                    ]
+                },
+                chemistry: {
+                    name: 'Chemistry',
+                    description: 'Complete chemistry course covering atomic structure, chemical bonds, reactions, and organic chemistry',
+                    chapters: [
+                        {
+                            id: 1,
+                            title: 'Atomic Structure',
+                            description: 'Atoms, electrons, protons, neutrons, and electron configuration',
+                            lessons: 8,
+                            duration: '2 weeks'
+                        },
+                        {
+                            id: 2,
+                            title: 'Chemical Bonding',
+                            description: 'Ionic, covalent, and metallic bonds, molecular geometry',
+                            lessons: 10,
+                            duration: '2.5 weeks'
+                        },
+                        {
+                            id: 3,
+                            title: 'Chemical Reactions',
+                            description: 'Types of reactions, balancing equations, stoichiometry',
+                            lessons: 12,
+                            duration: '3 weeks'
+                        },
+                        {
+                            id: 4,
+                            title: 'Organic Chemistry',
+                            description: 'Carbon compounds, functional groups, and organic reactions',
+                            lessons: 14,
+                            duration: '3.5 weeks'
+                        }
+                    ]
+                },
+                biology: {
+                    name: 'Biology',
+                    description: 'Comprehensive biology course covering cell biology, genetics, evolution, and ecology',
+                    chapters: [
+                        {
+                            id: 1,
+                            title: 'Cell Biology',
+                            description: 'Cell structure, organelles, cell processes, and cell division',
+                            lessons: 10,
+                            duration: '2.5 weeks'
+                        },
+                        {
+                            id: 2,
+                            title: 'Genetics',
+                            description: 'DNA, RNA, protein synthesis, and inheritance patterns',
+                            lessons: 12,
+                            duration: '3 weeks'
+                        },
+                        {
+                            id: 3,
+                            title: 'Evolution',
+                            description: 'Natural selection, evolutionary theory, and species adaptation',
+                            lessons: 8,
+                            duration: '2 weeks'
+                        },
+                        {
+                            id: 4,
+                            title: 'Ecology',
+                            description: 'Ecosystems, food chains, environmental interactions',
+                            lessons: 10,
+                            duration: '2.5 weeks'
+                        }
+                    ]
+                },
+                english: {
+                    name: 'English',
+                    description: 'Complete English course covering grammar, literature analysis, writing skills, and communication',
+                    chapters: [
+                        {
+                            id: 1,
+                            title: 'Grammar Fundamentals',
+                            description: 'Parts of speech, sentence structure, and punctuation rules',
+                            lessons: 8,
+                            duration: '2 weeks'
+                        },
+                        {
+                            id: 2,
+                            title: 'Literature Analysis',
+                            description: 'Reading comprehension, literary devices, and text analysis',
+                            lessons: 12,
+                            duration: '3 weeks'
+                        },
+                        {
+                            id: 3,
+                            title: 'Creative Writing',
+                            description: 'Narrative techniques, character development, and storytelling',
+                            lessons: 10,
+                            duration: '2.5 weeks'
+                        },
+                        {
+                            id: 4,
+                            title: 'Academic Writing',
+                            description: 'Essay structure, research skills, and citation methods',
+                            lessons: 8,
+                            duration: '2 weeks'
+                        }
+                    ]
+                },
+                history: {
+                    name: 'History',
+                    description: 'World history course covering ancient civilizations, major historical events, and cultural developments',
+                    chapters: [
+                        {
+                            id: 1,
+                            title: 'Ancient Civilizations',
+                            description: 'Egypt, Greece, Rome, and other early civilizations',
+                            lessons: 10,
+                            duration: '2.5 weeks'
+                        },
+                        {
+                            id: 2,
+                            title: 'Medieval Period',
+                            description: 'Middle Ages, feudalism, and cultural developments',
+                            lessons: 8,
+                            duration: '2 weeks'
+                        },
+                        {
+                            id: 3,
+                            title: 'Renaissance & Reformation',
+                            description: 'Cultural rebirth, scientific revolution, and religious changes',
+                            lessons: 10,
+                            duration: '2.5 weeks'
+                        },
+                        {
+                            id: 4,
+                            title: 'Modern Era',
+                            description: 'Industrial revolution, world wars, and contemporary history',
+                            lessons: 12,
+                            duration: '3 weeks'
+                        }
+                    ]
+                }
+            };
+            
+            return subjects[subject] || null;
+        }
+    </script>
+</body>
+</html>

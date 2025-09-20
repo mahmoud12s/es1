@@ -1,0 +1,17 @@
+{
+  "name": "es1-frontend",
+  "version": "1.0.0",
+  "description": "ES1 Class Organization - Frontend",
+  "main": "index.html",
+  "scripts": {
+    "serve": "npx http-server . -p 8000 -c-1",
+    "deploy": "echo 'Upload all files to your static hosting service (Netlify, Vercel, etc.)'",
+    "test": "echo 'Open index.html in browser'"
+  },
+  "keywords": ["education", "frontend", "static"],
+  "author": "ES1 Class Team",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}

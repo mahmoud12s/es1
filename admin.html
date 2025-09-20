@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - ES1 Class</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="config.js"></script>
+</head>
+<body>
+    <!-- Admin Header -->
+    <div class="admin-header">
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1>ES1 Class - Admin Panel</h1>
+                <div>
+                    <span id="welcomeUser" style="margin-right: 1rem;">Welcome, Admin</span>
+                    <button onclick="logout()" class="btn btn-secondary">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Navigation -->
+    <nav class="admin-nav">
+        <ul>
+            <li><a href="#dashboard" class="admin-nav-link active">Dashboard</a></li>
+            <li><a href="#schedule" class="admin-nav-link">Schedule Management</a></li>
+            <li><a href="#subjects" class="admin-nav-link">Subjects & Chapters</a></li>
+            <li><a href="#users" class="admin-nav-link">User Management</a></li>
+            <li><a href="#homework" class="admin-nav-link">Homework</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="admin-section">
+            <h3>Dashboard Overview</h3>
+            <div class="admin-grid">
+                <div class="admin-card">
+                    <h4><i class="fas fa-users"></i> Total Users</h4>
+                    <div style="font-size: 2rem; font-weight: 700; color: #000; margin: 1rem 0;">245</div>
+                    <p>Active students and teachers</p>
+                </div>
+                <div class="admin-card">
+                    <h4><i class="fas fa-book"></i> Total Subjects</h4>
+                    <div style="font-size: 2rem; font-weight: 700; color: #000; margin: 1rem 0;">8</div>
+                    <p>Mathematics, Physics, Chemistry, etc.</p>
+                </div>
+                <div class="admin-card">
+                    <h4><i class="fas fa-calendar"></i> This Week's Classes</h4>
+                    <div style="font-size: 2rem; font-weight: 700; color: #000; margin: 1rem 0;">32</div>
+                    <p>Scheduled classes for this week</p>
+                </div>
+                <div class="admin-card">
+                    <h4><i class="fas fa-bell"></i> Recent Activity</h4>
+                    <div style="margin: 1rem 0;">
+                        <div style="padding: 0.5rem 0; border-bottom: 1px solid #eee;">New chapter added to Math</div>
+                        <div style="padding: 0.5rem 0; border-bottom: 1px solid #eee;">Schedule updated for Tuesday</div>
+                        <div style="padding: 0.5rem 0;">3 new homework assignments posted</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Schedule Management Section -->
+        <section id="schedule" class="admin-section" style="display: none;">
+            <h3>Schedule Management</h3>
+            <div class="admin-grid">
+                <div class="admin-card">
+                    <h4>Add New Class</h4>
+                    <form id="addClassForm">
+                        <div class="form-group">
+                            <label>Day</label>
+                            <select name="day" required>
+                                <option value="">Select Day</option>
+                                <option value="Monday">Monday</option>
+                                <option value="Tuesday">Tuesday</option>
+                                <option value="Wednesday">Wednesday</option>
+                                <option value="Thursday">Thursday</option>
+                                <option value="Friday">Friday</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Subject</label>
+                            <input type="text" name="subject" placeholder="e.g., Mathematics" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Class</button>
+                    </form>
+                </div>
+                <div class="admin-card">
+                    <h4>Current Schedule</h4>
+                    <div id="currentSchedule">
+                        <!-- Schedule items will be loaded dynamically -->
+                        <p style="text-align: center; color: #666; padding: 2rem;">No classes scheduled yet.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Subjects & Chapters Section -->
+        <section id="subjects" class="admin-section" style="display: none;">
+            <h3>Subjects & Chapters Management</h3>
+            <div class="admin-grid">
+                <div class="admin-card">
+                    <h4>Add New Subject</h4>
+                    <form id="addSubjectForm">
+                        <div class="form-group">
+                            <label>Subject Name</label>
+                            <input type="text" name="name" placeholder="e.g., Mathematics" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea name="description" rows="3" placeholder="Brief description of the subject"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Subject</button>
+                    </form>
+                </div>
+                <div class="admin-card">
+                    <h4>Add New Chapter</h4>
+                    <form id="addChapterForm">
+                        <div class="form-group">
+                            <label>Subject</label>
+                            <select name="subject" id="subjectSelect" required>
+                                <option value="">Select Subject</option>
+                                <!-- Options will be loaded dynamically -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Chapter Title</label>
+                            <input type="text" name="title" placeholder="e.g., Quadratic Equations" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea name="description" rows="3" placeholder="Brief description of the chapter"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Number of Lessons</label>
+                                <input type="number" name="lessons" min="1" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Duration</label>
+                                <input type="text" name="duration" placeholder="e.g., 2 weeks" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Chapter</button>
+                    </form>
+                </div>
+            </div>
+            <div class="admin-grid" style="margin-top: 2rem;">
+                <div class="admin-card" style="grid-column: 1 / -1;">
+                    <h4>Existing Subjects & Chapters</h4>
+                    <div id="existingSubjects">
+                        <!-- Will be loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- User Management Section -->
+        <section id="users" class="admin-section" style="display: none;">
+            <h3>User Management</h3>
+            <div class="admin-grid">
+                <div class="admin-card">
+                    <h4>Add New User</h4>
+                    <form id="addUserForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Username</label>
+                                <input type="text" name="username" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Role</label>
+                                <select name="role" required>
+                                    <option value="">Select Role</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="teacher">Teacher</option>
+                                    <option value="student">Student</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" name="password" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Permissions (for teachers)</label>
+                            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                                <label><input type="checkbox" name="permissions" value="schedule"> Manage Schedule</label>
+                                <label><input type="checkbox" name="permissions" value="content"> Add Content</label>
+                                <label><input type="checkbox" name="permissions" value="homework"> Manage Homework</label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add User</button>
+                    </form>
+                </div>
+                <div class="admin-card">
+                    <h4>Existing Users</h4>
+                    <div id="existingUsers">
+                        <div style="margin-bottom: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 5px;">
+                            <strong>admin</strong> <span style="background: #000; color: white; padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.8rem;">ADMIN</span>
+                            <button onclick="deleteUser(this)" style="float: right; background: #dc3545; color: white; border: none; padding: 0.25rem 0.5rem; border-radius: 3px; cursor: pointer;">Delete</button>
+                        </div>
+                        <div style="margin-bottom: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 5px;">
+                            <strong>teacher</strong> <span style="background: #007bff; color: white; padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.8rem;">TEACHER</span>
+                            <p style="margin: 0.5rem 0; color: #666; font-size: 0.9rem;">Permissions: Schedule, Content, Homework</p>
+                            <button onclick="deleteUser(this)" style="float: right; background: #dc3545; color: white; border: none; padding: 0.25rem 0.5rem; border-radius: 3px; cursor: pointer;">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Homework Section -->
+        <section id="homework" class="admin-section" style="display: none;">
+            <h3>Homework Management</h3>
+            <div class="admin-grid">
+                <div class="admin-card">
+                    <h4>Add New Homework Assignment</h4>
+                    <form id="addHomeworkForm">
+                        <div class="form-group">
+                            <label>Subject</label>
+                            <input type="text" name="subject" placeholder="e.g., Mathematics" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Assignment Description</label>
+                            <textarea name="description" rows="3" placeholder="e.g., Complete exercises 1-15 from Chapter 5" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Due Date</label>
+                            <input type="text" name="date" placeholder="e.g., Monday 15/9" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Homework</button>
+                    </form>
+                </div>
+                <div class="admin-card">
+                    <h4>Recent Homework Assignments</h4>
+                    <div id="recentHomework">
+                        <div style="margin-bottom: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 5px;">
+                            <strong>Mathematics</strong>
+                            <p style="margin: 0.5rem 0; color: #666;">Complete exercises 1-15 from Chapter 5</p>
+                            <small>Due: Monday 15/9</small>
+                            <button onclick="deleteHomework(this)" style="float: right; background: #dc3545; color: white; border: none; padding: 0.25rem 0.5rem; border-radius: 3px; cursor: pointer;">Delete</button>
+                        </div>
+                        <div style="margin-bottom: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 5px;">
+                            <strong>Physics</strong>
+                            <p style="margin: 0.5rem 0; color: #666;">Read Chapter 3 and answer questions 1-10</p>
+                            <small>Due: Wednesday 18/9</small>
+                            <button onclick="deleteHomework(this)" style="float: right; background: #dc3545; color: white; border: none; padding: 0.25rem 0.5rem; border-radius: 3px; cursor: pointer;">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // API Helper function
+        function getApiUrl(endpoint) {
+            const baseUrl = window.CONFIG ? window.CONFIG.API_BASE_URL : 'http://localhost:3000/api';
+            return `${baseUrl}${endpoint}`;
+        }
+
+        // Check authentication on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('userToken');
+            const role = localStorage.getItem('userRole');
+            const username = localStorage.getItem('username');
+            
+            console.log('Checking authentication on page load...');
+            console.log('Token exists:', !!token);
+            console.log('Role:', role);
+            console.log('Username:', username);
+            
+            if (!token || token === 'null' || token === 'undefined') {
+                console.log('No valid token found, redirecting to login');
+                showNotification('Please login to access the admin panel', 'info');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Update welcome message
+            document.getElementById('welcomeUser').textContent = `Welcome, ${username || role}`;
+            
+            // Show/hide sections based on role
+            if (role === 'teacher') {
+                // Teachers have limited access
+                document.querySelector('a[href="#users"]').style.display = 'none';
+                showNotification('Teacher access granted. Some admin features are restricted.', 'info');
+            }
+            
+            // Load initial data
+            loadSubjectsForAdmin();
+            loadHomeworkForAdmin();
+            loadDashboardStats();
+            
+            // Test authentication
+            testAuthentication();
+        });
+
+        // Navigation functionality
+        document.querySelectorAll('.admin-nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Remove active class from all links
+                document.querySelectorAll('.admin-nav-link').forEach(l => l.classList.remove('active'));
+                // Add active class to clicked link
+                this.classList.add('active');
+                
+                // Hide all sections
+                document.querySelectorAll('.admin-section').forEach(section => {
+                    section.style.display = 'none';
+                });
+                
+                // Show selected section
+                const targetSection = this.getAttribute('href').substring(1);
+                document.getElementById(targetSection).style.display = 'block';
+            });
+        });
+
+        // Form handlers
+        document.getElementById('addClassForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            
+            try {
+                const token = localStorage.getItem('userToken');
+                const role = localStorage.getItem('userRole');
+                console.log('Submitting schedule form with data:', {
+                    day: formData.get('day'),
+                    subject: formData.get('subject')
+                });
+                console.log('Auth check - Token exists:', !!token, 'Role:', role);
+                
+                if (!token) {
+                    showNotification('Authentication required. Please login again.', 'error');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                const response = await fetch(getApiUrl('/schedule'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        day: formData.get('day'),
+                        subject: formData.get('subject')
+                    })
+                });
+                
+                console.log('Schedule response status:', response.status);
+                
+                let responseData;
+                try {
+                    responseData = await response.json();
+                    console.log('Schedule response data:', responseData);
+                } catch (jsonError) {
+                    console.error('Failed to parse JSON response:', jsonError);
+                    const textResponse = await response.text();
+                    console.log('Raw response text:', textResponse);
+                    responseData = { message: textResponse };
+                }
+                
+                if (response.ok) {
+                    // Clear "no classes" message if it exists
+                    const currentSchedule = document.getElementById('currentSchedule');
+                    if (currentSchedule.querySelector('p')) {
+                        currentSchedule.innerHTML = '';
+                    }
+                    
+                    const classItem = document.createElement('div');
+                    classItem.style.cssText = 'margin-bottom: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 5px;';
+                    classItem.innerHTML = `
+                        <strong>${formData.get('day')} - ${formData.get('subject')}</strong>
+                        <button onclick="deleteClass(this)" style="float: right; background: #dc3545; color: white; border: none; padding: 0.25rem 0.5rem; border-radius: 3px; cursor: pointer;">Delete</button>
+                    `;
+                    
+                    currentSchedule.appendChild(classItem);
+                    this.reset();
+                    showNotification('Class added successfully!', 'success');
+                } else {
+                    console.error('Error response:', responseData);
+                    showNotification(responseData.message || 'Error adding class', 'error');
+                }
+            } catch (error) {
+                console.error('Error adding class:', error);
+                showNotification('Error adding class: ' + error.message, 'error');
+            }
+        });
+
+        document.getElementById('addSubjectForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            
+            try {
+                const token = localStorage.getItem('userToken');
+                const role = localStorage.getItem('userRole');
+                console.log('Submitting subject form with data:', {
+                    name: formData.get('name'),
+                    description: formData.get('description')
+                });
+                console.log('Auth check - Token exists:', !!token, 'Role:', role);
+                
+                if (!token) {
+                    showNotification('Authentication required. Please login again.', 'error');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                const response = await fetch(getApiUrl('/subjects'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        name: formData.get('name'),
+                        description: formData.get('description')
+                    })
+                });
+                
+                console.log('Subject response status:', response.status);
+                
+                let responseData;
+                try {
+                    responseData = await response.json();
+                    console.log('Subject response data:', responseData);
+                } catch (jsonError) {
+                    console.error('Failed to parse JSON response:', jsonError);
+                    const textResponse = await response.text();
+                    console.log('Raw response text:', textResponse);
+                    responseData = { message: textResponse };
+                }
+                
+                if (response.ok) {
+                    this.reset();
+                    showNotification('Subject added successfully!', 'success');
+                    loadSubjectsForAdmin(); // Reload subjects
+                } else {
+                    console.error('Subject error response:', responseData);
+                    showNotification(responseData.message || 'Error adding subject', 'error');
+                }
+            } catch (error) {
+                console.error('Error adding subject:', error);
+                console.error('Error stack:', error.stack);
+                showNotification('Error adding subject: ' + error.message, 'error');
+            }
+        });
+
+        document.getElementById('addChapterForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            
+            try {
+                const token = localStorage.getItem('userToken');
+                const subjectId = formData.get('subject');
+                
+                const response = await fetch(`/api/subjects/${subjectId}/chapters`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        title: formData.get('title'),
+                        description: formData.get('description'),
+                        lessons: formData.get('lessons'),
+                        duration: formData.get('duration')
+                    })
+                });
+                
+                if (response.ok) {
+                    this.reset();
+                    showNotification('Chapter added successfully!', 'success');
+                    loadSubjectsForAdmin(); // Reload subjects
+                } else {
+                    showNotification('Error adding chapter', 'error');
+                }
+            } catch (error) {
+                showNotification('Error adding chapter', 'error');
+            }
+        });
+
+        document.getElementById('addUserForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const permissions = Array.from(document.querySelectorAll('input[name="permissions"]:checked')).map(cb => cb.value);
+            
+            const userItem = document.createElement('div');
+            userItem.style.cssText = 'margin-bottom: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 5px;';
+            
+            let roleColor = formData.get('role') === 'admin' ? '#000' : formData.get('role') === 'teacher' ? '#007bff' : '#28a745';
+            let permissionsText = permissions.length > 0 ? `<p style="margin: 0.5rem 0; color: #666; font-size: 0.9rem;">Permissions: ${permissions.join(', ')}</p>` : '';
+            
+            userItem.innerHTML = `
+                <strong>${formData.get('username')}</strong> 
+                <span style="background: ${roleColor}; color: white; padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.8rem;">${formData.get('role').toUpperCase()}</span>
+                ${permissionsText}
+                <button onclick="deleteUser(this)" style="float: right; background: #dc3545; color: white; border: none; padding: 0.25rem 0.5rem; border-radius: 3px; cursor: pointer;">Delete</button>
+            `;
+            
+            document.getElementById('existingUsers').appendChild(userItem);
+            this.reset();
+            showNotification('User added successfully!', 'success');
+        });
+
+        document.getElementById('addHomeworkForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            
+            try {
+                const token = localStorage.getItem('userToken');
+                const response = await fetch(getApiUrl('/homework'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        subject: formData.get('subject'),
+                        description: formData.get('description'),
+                        date: formData.get('date')
+                    })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    
+                    const homeworkItem = document.createElement('div');
+                    homeworkItem.style.cssText = 'margin-bottom: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 5px;';
+                    homeworkItem.dataset.id = result.homework._id;
+                    
+                    homeworkItem.innerHTML = `
+                        <strong>${formData.get('subject')}</strong>
+                        <p style="margin: 0.5rem 0; color: #666;">${formData.get('description')}</p>
+                        <small>Due: ${formData.get('date')}</small>
+                        <button onclick="deleteHomework(this)" style="float: right; background: #dc3545; color: white; border: none; padding: 0.25rem 0.5rem; border-radius: 3px; cursor: pointer;">Delete</button>
+                    `;
+                    
+                    document.getElementById('recentHomework').appendChild(homeworkItem);
+                    this.reset();
+                    showNotification('Homework added successfully!', 'success');
+                } else {
+                    showNotification('Error adding homework', 'error');
+                }
+            } catch (error) {
+                console.error('Error adding homework:', error);
+                showNotification('Error adding homework', 'error');
+            }
+        });
+
+        // Delete functions
+        function deleteClass(button) {
+            if (confirm('Are you sure you want to delete this class?')) {
+                button.parentElement.remove();
+                showNotification('Class deleted successfully!', 'success');
+            }
+        }
+
+        function deleteChapter(button) {
+            if (confirm('Are you sure you want to delete this chapter?')) {
+                button.parentElement.remove();
+                showNotification('Chapter deleted successfully!', 'success');
+            }
+        }
+
+        function deleteUser(button) {
+            if (confirm('Are you sure you want to delete this user?')) {
+                button.parentElement.remove();
+                showNotification('User deleted successfully!', 'success');
+            }
+        }
+
+        async function deleteHomework(button) {
+            if (confirm('Are you sure you want to delete this homework assignment?')) {
+                try {
+                    const homeworkElement = button.parentElement;
+                    const homeworkId = homeworkElement.dataset.id;
+                    
+                    if (homeworkId) {
+                        const token = localStorage.getItem('userToken');
+                        const response = await fetch(`/api/homework/${homeworkId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            homeworkElement.remove();
+                            showNotification('Homework deleted successfully!', 'success');
+                        } else {
+                            showNotification('Error deleting homework', 'error');
+                        }
+                    } else {
+                        // For homework items without ID (temporary ones)
+                        homeworkElement.remove();
+                        showNotification('Homework deleted successfully!', 'success');
+                    }
+                } catch (error) {
+                    console.error('Error deleting homework:', error);
+                    showNotification('Error deleting homework', 'error');
+                }
+            }
+        }
+
+        // Load homework for admin panel
+        async function loadHomeworkForAdmin() {
+            try {
+                const response = await fetch(getApiUrl('/homework'));
+                const homework = await response.json();
+                
+                const container = document.getElementById('recentHomework');
+                if (!container) return;
+                
+                // Clear existing homework items except examples
+                const existingItems = container.querySelectorAll('[data-id]');
+                existingItems.forEach(item => item.remove());
+                
+                homework.forEach(hw => {
+                    const homeworkItem = document.createElement('div');
+                    homeworkItem.style.cssText = 'margin-bottom: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 5px;';
+                    homeworkItem.dataset.id = hw._id;
+                    
+                    homeworkItem.innerHTML = `
+                        <strong>${hw.subject}</strong>
+                        <p style="margin: 0.5rem 0; color: #666;">${hw.description}</p>
+                        <small>Due: ${hw.date}</small>
+                        <button onclick="deleteHomework(this)" style="float: right; background: #dc3545; color: white; border: none; padding: 0.25rem 0.5rem; border-radius: 3px; cursor: pointer;">Delete</button>
+                    `;
+                    
+                    container.appendChild(homeworkItem);
+                });
+                
+            } catch (error) {
+                console.error('Error loading homework for admin:', error);
+            }
+        }
+
+        // Load subjects for admin panel
+        async function loadSubjectsForAdmin() {
+            try {
+                const response = await fetch(getApiUrl('/subjects'));
+                const subjects = await response.json();
+                
+                // Update subject select dropdown
+                const subjectSelect = document.getElementById('subjectSelect');
+                subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+                
+                subjects.forEach(subject => {
+                    const option = document.createElement('option');
+                    option.value = subject._id;
+                    option.textContent = subject.name;
+                    subjectSelect.appendChild(option);
+                });
+                
+                // Update existing subjects display
+                const existingSubjects = document.getElementById('existingSubjects');
+                existingSubjects.innerHTML = '';
+                
+                if (subjects.length === 0) {
+                    existingSubjects.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">No subjects created yet.</p>';
+                    return;
+                }
+                
+                subjects.forEach(subject => {
+                    const subjectDiv = document.createElement('div');
+                    subjectDiv.style.cssText = 'margin-bottom: 2rem; padding: 1.5rem; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef;';
+                    
+                    let chaptersHtml = '';
+                    if (subject.chapters.length > 0) {
+                        chaptersHtml = subject.chapters.map(chapter => `
+                            <div style="margin: 1rem 0; padding: 1rem; background: white; border-radius: 5px; border-left: 4px solid #000;">
+                                <strong>${chapter.title}</strong>
+                                <p style="margin: 0.5rem 0; color: #666; font-size: 0.9rem;">${chapter.description || 'No description'}</p>
+                                <small style="color: #888;">${chapter.lessons} lessons • ${chapter.duration}</small>
+                                <button onclick="deleteChapter('${subject._id}', '${chapter._id}')" style="float: right; background: #dc3545; color: white; border: none; padding: 0.25rem 0.5rem; border-radius: 3px; cursor: pointer; font-size: 0.8rem;">Delete</button>
+                            </div>
+                        `).join('');
+                    } else {
+                        chaptersHtml = '<p style="color: #888; font-style: italic; margin: 1rem 0;">No chapters added yet.</p>';
+                    }
+                    
+                    subjectDiv.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                            <div>
+                                <h4 style="margin: 0 0 0.5rem 0; color: #000;">${subject.name}</h4>
+                                <p style="margin: 0; color: #666;">${subject.description || 'No description'}</p>
+                            </div>
+                            <button onclick="deleteSubject('${subject._id}')" style="background: #dc3545; color: white; border: none; padding: 0.5rem 1rem; border-radius: 5px; cursor: pointer;">Delete Subject</button>
+                        </div>
+                        <div style="border-top: 1px solid #ddd; padding-top: 1rem;">
+                            <h5 style="margin: 0 0 1rem 0; color: #333;">Chapters (${subject.chapters.length})</h5>
+                            ${chaptersHtml}
+                        </div>
+                    `;
+                    
+                    existingSubjects.appendChild(subjectDiv);
+                });
+                
+            } catch (error) {
+                console.error('Error loading subjects:', error);
+            }
+        }
+        
+        // Load dashboard stats
+        async function loadDashboardStats() {
+            try {
+                const token = localStorage.getItem('userToken');
+                const response = await fetch(getApiUrl('/dashboard-stats'), {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const stats = await response.json();
+                    
+                    // Update dashboard numbers (if elements exist)
+                    const userCount = document.querySelector('#dashboard .admin-card:nth-child(1) div[style*="font-size: 2rem"]');
+                    const subjectCount = document.querySelector('#dashboard .admin-card:nth-child(2) div[style*="font-size: 2rem"]');
+                    const scheduleCount = document.querySelector('#dashboard .admin-card:nth-child(3) div[style*="font-size: 2rem"]');
+                    
+                    if (userCount) userCount.textContent = stats.users;
+                    if (subjectCount) subjectCount.textContent = stats.subjects;
+                    if (scheduleCount) scheduleCount.textContent = stats.scheduleItems;
+                }
+            } catch (error) {
+                console.error('Error loading dashboard stats:', error);
+            }
+        }
+        
+        // Delete subject function
+        async function deleteSubject(subjectId) {
+            if (confirm('Are you sure you want to delete this subject? This will also delete all its chapters.')) {
+                try {
+                    const token = localStorage.getItem('userToken');
+                    const response = await fetch(`/api/subjects/${subjectId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        showNotification('Subject deleted successfully!', 'success');
+                        loadSubjectsForAdmin(); // Reload subjects
+                    } else {
+                        showNotification('Error deleting subject', 'error');
+                    }
+                } catch (error) {
+                    showNotification('Error deleting subject', 'error');
+                }
+            }
+        }
+        
+        // Delete chapter function  
+        async function deleteChapter(subjectId, chapterId) {
+            if (confirm('Are you sure you want to delete this chapter?')) {
+                try {
+                    const token = localStorage.getItem('userToken');
+                    const response = await fetch(`/api/subjects/${subjectId}/chapters/${chapterId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        showNotification('Chapter deleted successfully!', 'success');
+                        loadSubjectsForAdmin(); // Reload subjects
+                    } else {
+                        showNotification('Error deleting chapter', 'error');
+                    }
+                } catch (error) {
+                    showNotification('Error deleting chapter', 'error');
+                }
+            }
+        }
+
+        // Test authentication function
+        async function testAuthentication() {
+            try {
+                const token = localStorage.getItem('userToken');
+                console.log('Testing authentication...');
+                console.log('Token value:', token);
+                
+                if (!token || token === 'null' || token === 'undefined') {
+                    console.log('No valid token for testing');
+                    clearAuthAndRedirect();
+                    return;
+                }
+                
+                const response = await fetch(getApiUrl('/dashboard-stats'), {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                console.log('Auth test response status:', response.status);
+                
+                if (response.status === 401 || response.status === 403) {
+                    console.log('Authentication failed, clearing tokens and redirecting');
+                    clearAuthAndRedirect();
+                } else {
+                    console.log('Authentication successful');
+                }
+            } catch (error) {
+                console.error('Auth test error:', error);
+                clearAuthAndRedirect();
+            }
+        }
+        
+        // Clear authentication and redirect to login
+        function clearAuthAndRedirect() {
+            console.log('Clearing corrupted authentication data');
+            localStorage.removeItem('userToken');
+            localStorage.removeItem('userRole');
+            localStorage.removeItem('username');
+            showNotification('Please login again', 'info');
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 1500);
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('userToken');
+                localStorage.removeItem('userRole');
+                localStorage.removeItem('username');
+                window.location.href = 'login.html';
+            }
+        }
+    </script>
+</body>
+</html>
