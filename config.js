@@ -3,9 +3,20 @@
 
 const CONFIG = {
     // API Configuration
-    API_BASE_URL: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-        ? 'http://localhost:3000/api'  // Local development
-        : 'http://earth.bssr-nodes.com:2092/api',  // Production backend URL
+    API_BASE_URL: (() => {
+        const hostname = window.location.hostname;
+        
+        // Local development
+        if (hostname === 'localhost' || hostname === '127.0.0.1') {
+            return 'http://localhost:3000/api';
+        }
+        
+        // Production - Try HTTPS first, fallback handled in code
+        return 'https://earth.bssr-nodes.com:2092/api';
+    })(),
+    
+    // Fallback API URL for mixed content issues
+    FALLBACK_API_URL: 'http://earth.bssr-nodes.com:2092/api',
     
     // Application Settings
     APP_NAME: 'ES1 Class Organization',
