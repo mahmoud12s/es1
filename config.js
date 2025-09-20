@@ -12,7 +12,7 @@ const CONFIG = {
         }
         
         // Production - Try HTTPS first, fallback handled in code
-        return 'https://earth.bssr-nodes.com:2092/api';
+        return 'http://earth.bssr-nodes.com:2092/api';
     })(),
     
     // Fallback API URL for mixed content issues
@@ -43,3 +43,4 @@ if (typeof module !== 'undefined' && module.exports) {
 } else {
     window.CONFIG = CONFIG;
 }
+
