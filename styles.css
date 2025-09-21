@@ -121,6 +121,19 @@ body.nav-open {
     background-color: #ffffff;
     margin: 3px 0;
     transition: 0.3s;
+    display: block;
+    border-radius: 2px;
+}
+
+/* Ensure bars are visible on mobile */
+@media (max-width: 768px) {
+    .hamburger .bar {
+        background-color: #ffffff !important;
+        width: 25px !important;
+        height: 3px !important;
+        display: block !important;
+        margin: 4px 0 !important;
+    }
 }
 
 /* Hero Section */
@@ -959,6 +972,14 @@ body.nav-open {
     .hamburger {
         display: flex;
         z-index: 1002;
+        position: relative;
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 8px;
+        border-radius: 4px;
+        min-width: 40px;
+        min-height: 40px;
+        align-items: center;
+        justify-content: center;
     }
     
     .hamburger.active .bar:nth-child(1) {

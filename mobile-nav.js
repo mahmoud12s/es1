@@ -1,87 +1,151 @@
-// Mobile Navigation - Clean and Simple
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔧 Mobile Navigation: DOM loaded');
+// Mobile Navigation - Enhanced and Robust
+(function() {
+    'use strict';
     
-    // Wait a bit for all elements to render
-    setTimeout(function() {
-        const hamburger = document.querySelector('.hamburger');
-        const navCenter = document.querySelector('.nav-center');
-        
-        console.log('🔧 Mobile Navigation: Elements found', {
-            hamburger: !!hamburger,
-            navCenter: !!navCenter
-        });
-        
-        if (!hamburger || !navCenter) {
-            console.warn('🔧 Mobile Navigation: Elements not found, retrying...');
-            setTimeout(arguments.callee, 100);
+    let initialized = false;
+    let retryCount = 0;
+    const maxRetries = 10;
+    
+    function initMobileNavigation() {
+        if (initialized) {
+            console.log('🔧 Mobile Navigation: Already initialized');
             return;
         }
         
-        // Ensure menu starts closed
+        console.log('🔧 Mobile Navigation: Attempting initialization...');
+        
+        const hamburger = document.querySelector('.hamburger');
+        const navCenter = document.querySelector('.nav-center');
+        
+        console.log('🔧 Mobile Navigation: Element check', {
+            hamburger: !!hamburger,
+            navCenter: !!navCenter,
+            hamburgerVisible: hamburger ? window.getComputedStyle(hamburger).display !== 'none' : false,
+            retryCount: retryCount
+        });
+        
+        if (!hamburger || !navCenter) {
+            retryCount++;
+            if (retryCount < maxRetries) {
+                console.warn(`🔧 Mobile Navigation: Elements not found, retrying... (${retryCount}/${maxRetries})`);
+                setTimeout(initMobileNavigation, 200);
+                return;
+            } else {
+                console.error('🔧 Mobile Navigation: Failed to find elements after maximum retries');
+                return;
+            }
+        }
+        
+        // Clear any existing state
         hamburger.classList.remove('active');
         navCenter.classList.remove('active');
         document.body.classList.remove('nav-open');
         
-        console.log('🔧 Mobile Navigation: Setting up click handlers');
+        // Add visual indicator that hamburger is clickable
+        hamburger.style.cursor = 'pointer';
+        hamburger.style.userSelect = 'none';
         
-        // Hamburger click handler
-        hamburger.addEventListener('click', function(e) {
+        console.log('🔧 Mobile Navigation: Adding event listeners');
+        
+        // Remove any existing listeners
+        const newHamburger = hamburger.cloneNode(true);
+        hamburger.parentNode.replaceChild(newHamburger, hamburger);
+        
+        // Main hamburger click handler
+        newHamburger.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
             
-            console.log('🔧 Mobile Navigation: Hamburger clicked');
+            console.log('🔧 Mobile Navigation: Hamburger clicked!');
             
-            const isActive = hamburger.classList.contains('active');
+            const isCurrentlyActive = newHamburger.classList.contains('active');
             
-            if (isActive) {
+            if (isCurrentlyActive) {
                 // Close menu
-                hamburger.classList.remove('active');
+                newHamburger.classList.remove('active');
                 navCenter.classList.remove('active');
                 document.body.classList.remove('nav-open');
-                console.log('🔧 Mobile Navigation: Menu closed');
+                console.log('🔧 Mobile Navigation: ✅ Menu CLOSED');
             } else {
                 // Open menu
-                hamburger.classList.add('active');
+                newHamburger.classList.add('active');
                 navCenter.classList.add('active');
                 document.body.classList.add('nav-open');
-                console.log('🔧 Mobile Navigation: Menu opened');
+                console.log('🔧 Mobile Navigation: ✅ Menu OPENED');
             }
         });
         
-        // Close menu when clicking nav links
+        // Touch events for mobile
+        newHamburger.addEventListener('touchstart', function(e) {
+            console.log('🔧 Mobile Navigation: Touch detected on hamburger');
+            e.preventDefault();
+        });
+        
+        // Navigation link clicks
         document.querySelectorAll('.nav-link').forEach(function(link) {
             link.addEventListener('click', function() {
                 console.log('🔧 Mobile Navigation: Nav link clicked, closing menu');
-                hamburger.classList.remove('active');
+                newHamburger.classList.remove('active');
                 navCenter.classList.remove('active');
                 document.body.classList.remove('nav-open');
             });
         });
         
-        // Close menu when clicking outside
+        // Click outside to close
         document.addEventListener('click', function(e) {
-            if (!navCenter.contains(e.target) && !hamburger.contains(e.target)) {
-                if (hamburger.classList.contains('active')) {
+            if (newHamburger.classList.contains('active')) {
+                if (!navCenter.contains(e.target) && !newHamburger.contains(e.target)) {
                     console.log('🔧 Mobile Navigation: Clicked outside, closing menu');
-                    hamburger.classList.remove('active');
+                    newHamburger.classList.remove('active');
                     navCenter.classList.remove('active');
                     document.body.classList.remove('nav-open');
                 }
             }
         });
         
-        // Close menu with escape key
+        // Escape key to close
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && hamburger.classList.contains('active')) {
-                console.log('🔧 Mobile Navigation: Escape pressed, closing menu');
-                hamburger.classList.remove('active');
+            if (e.key === 'Escape' && newHamburger.classList.contains('active')) {
+                console.log('🔧 Mobile Navigation: Escape key pressed, closing menu');
+                newHamburger.classList.remove('active');
                 navCenter.classList.remove('active');
                 document.body.classList.remove('nav-open');
             }
         });
         
-        console.log('🔧 Mobile Navigation: Initialized successfully');
+        initialized = true;
+        console.log('🔧 Mobile Navigation: ✅ SUCCESSFULLY INITIALIZED');
         
-    }, 300); // Wait 300ms for elements to be ready
-});
+        // Test click after initialization
+        setTimeout(function() {
+            console.log('🔧 Mobile Navigation: Ready for interaction');
+        }, 100);
+    }
+    
+    // Multiple initialization strategies
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(initMobileNavigation, 100);
+        });
+    } else {
+        setTimeout(initMobileNavigation, 100);
+    }
+    
+    window.addEventListener('load', function() {
+        if (!initialized) {
+            setTimeout(initMobileNavigation, 100);
+        }
+    });
+    
+    // Expose for manual testing
+    window.testMobileNav = function() {
+        const hamburger = document.querySelector('.hamburger');
+        if (hamburger) {
+            hamburger.click();
+            console.log('🔧 Manual test: Hamburger clicked');
+        } else {
+            console.log('🔧 Manual test: Hamburger not found');
+        }
+    };
+    
+})();

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mobile Navigation Test - ES1 Class</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="mobile-nav.js"></script>
+    <style>
+        /* Debug styles */
+        .debug-info {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 9999;
+        }
+        
+        .hamburger {
+            border: 2px solid red !important;
+            background-color: rgba(255,0,0,0.2) !important;
+        }
+        
+        .hamburger .bar {
+            background-color: #fff !important;
+            box-shadow: 0 0 5px rgba(255,255,255,0.5);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2>ES1 Class - Mobile Test</h2>
+            </div>
+            <div class="nav-center">
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="schedule.html" class="nav-link">Weekly Program</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="subjects.html" class="nav-link active">Subjects</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="agenda.html" class="nav-link">Agenda</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="login.html" class="nav-link">Admin Login</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="nav-right">
+                <div class="nav-language">
+                    <button id="languageToggle" class="btn btn-secondary" style="padding: 8px 16px;">
+                        <i class="fas fa-language"></i> <span id="currentLang">EN</span>
+                    </button>
+                </div>
+                <div class="hamburger" onclick="console.log('Direct click detected!')">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div style="padding: 120px 20px 40px;">
+        <h1>Mobile Navigation Test Page</h1>
+        <p>This page is specifically for testing mobile navigation.</p>
+        
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3>Debug Instructions:</h3>
+            <ol>
+                <li>Open browser developer tools (F12)</li>
+                <li>Go to Console tab</li>
+                <li>Resize browser to mobile width (&lt; 768px) or use device emulation</li>
+                <li>Look for hamburger menu (☰) with red border</li>
+                <li>Click the hamburger menu</li>
+                <li>Check console for debug messages starting with 🔧</li>
+            </ol>
+        </div>
+        
+        <div style="background: #e9ecef; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3>Manual Test Buttons:</h3>
+            <button onclick="window.testMobileNav()" style="padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                Test Mobile Nav
+            </button>
+            <button onclick="console.log('Hamburger element:', document.querySelector('.hamburger'))" style="padding: 10px 20px; margin: 5px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                Check Hamburger Element
+            </button>
+            <button onclick="console.log('Nav center element:', document.querySelector('.nav-center'))" style="padding: 10px 20px; margin: 5px; background: #ffc107; color: black; border: none; border-radius: 5px; cursor: pointer;">
+                Check Nav Center Element
+            </button>
+        </div>
+        
+        <div style="background: #fff3cd; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #ffeaa7;">
+            <h3>Expected Console Output:</h3>
+            <pre style="background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; font-size: 12px;">
+🔧 Mobile Navigation: Attempting initialization...
+🔧 Mobile Navigation: Element check {hamburger: true, navCenter: true, hamburgerVisible: true, retryCount: 0}
+🔧 Mobile Navigation: Adding event listeners
+🔧 Mobile Navigation: ✅ SUCCESSFULLY INITIALIZED
+🔧 Mobile Navigation: Ready for interaction
+🔧 Mobile Navigation: Hamburger clicked!
+🔧 Mobile Navigation: ✅ Menu OPENED
+            </pre>
+        </div>
+    </div>
+
+    <div class="debug-info">
+        <div>Screen Width: <span id="screenWidth"></span>px</div>
+        <div>Hamburger Visible: <span id="hamburgerVisible">checking...</span></div>
+        <div>Nav Center Found: <span id="navCenterFound">checking...</span></div>
+    </div>
+
+    <script>
+        // Debug info updater
+        function updateDebugInfo() {
+            document.getElementById('screenWidth').textContent = window.innerWidth;
+            
+            const hamburger = document.querySelector('.hamburger');
+            const navCenter = document.querySelector('.nav-center');
+            
+            document.getElementById('hamburgerVisible').textContent = hamburger ? 
+                (window.getComputedStyle(hamburger).display !== 'none' ? 'YES' : 'NO') : 'NOT FOUND';
+            
+            document.getElementById('navCenterFound').textContent = navCenter ? 'YES' : 'NO';
+        }
+        
+        setInterval(updateDebugInfo, 1000);
+        window.addEventListener('resize', updateDebugInfo);
+        updateDebugInfo();
+    </script>
+</body>
+</html>

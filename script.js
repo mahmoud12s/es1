@@ -1,83 +1,5 @@
-// Mobile Navigation Toggle - Global Function
-function initMobileNavigation() {
-    const hamburger = document.querySelector('.hamburger');
-    const navCenter = document.querySelector('.nav-center');
-
-    console.log('Initializing mobile navigation...', { hamburger: !!hamburger, navCenter: !!navCenter });
-
-    if (hamburger && navCenter) {
-        // Remove existing event listeners to prevent duplicates
-        hamburger.removeEventListener('click', handleHamburgerClick);
-        
-        // Add click handler for hamburger menu
-        hamburger.addEventListener('click', handleHamburgerClick);
-
-        // Close mobile menu when clicking on a link
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.removeEventListener('click', handleNavLinkClick);
-            link.addEventListener('click', handleNavLinkClick);
-        });
-        
-        // Close mobile menu when clicking outside
-        document.removeEventListener('click', handleOutsideClick);
-        document.addEventListener('click', handleOutsideClick);
-        
-        console.log('Mobile navigation initialized successfully');
-    } else {
-        console.warn('Mobile navigation elements not found:', { hamburger: !!hamburger, navCenter: !!navCenter });
-    }
-}
-
-// Event handler functions
-function handleHamburgerClick(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    const hamburger = document.querySelector('.hamburger');
-    const navCenter = document.querySelector('.nav-center');
-    
-    if (hamburger && navCenter) {
-        hamburger.classList.toggle('active');
-        navCenter.classList.toggle('active');
-        document.body.classList.toggle('nav-open');
-        
-        console.log('Mobile menu toggled:', {
-            hamburgerActive: hamburger.classList.contains('active'),
-            navCenterActive: navCenter.classList.contains('active'),
-            bodyNavOpen: document.body.classList.contains('nav-open')
-        });
-    }
-}
-
-function handleNavLinkClick() {
-    const hamburger = document.querySelector('.hamburger');
-    const navCenter = document.querySelector('.nav-center');
-    
-    if (hamburger && navCenter) {
-        hamburger.classList.remove('active');
-        navCenter.classList.remove('active');
-        document.body.classList.remove('nav-open');
-        console.log('Mobile menu closed via nav link click');
-    }
-}
-
-function handleOutsideClick(e) {
-    const hamburger = document.querySelector('.hamburger');
-    const navCenter = document.querySelector('.nav-center');
-    
-    if (hamburger && navCenter && !navCenter.contains(e.target) && !hamburger.contains(e.target)) {
-        hamburger.classList.remove('active');
-        navCenter.classList.remove('active');
-        document.body.classList.remove('nav-open');
-        console.log('Mobile menu closed via outside click');
-    }
-}
-
-// Initialize mobile navigation on DOM content loaded
-document.addEventListener('DOMContentLoaded', function() {
-    // Add a small delay to ensure all elements are rendered
-    setTimeout(initMobileNavigation, 100);
-});
+// Mobile Navigation is now handled by mobile-nav.js
+// Removed duplicate mobile navigation code to prevent conflicts
 
 // Smooth Scrolling for Navigation Links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -616,10 +538,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     console.log('Initializing page:', currentPage);
     
-    // Always initialize mobile navigation for all pages
-    setTimeout(() => {
-        initMobileNavigation();
-    }, 200);
+    // Mobile navigation is handled by mobile-nav.js
     
     switch (currentPage) {
         case 'index.html':
