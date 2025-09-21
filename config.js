@@ -1,8 +1,14 @@
 // Frontend Configuration
-// This file contains the configuration for the frontend application
+// 🎯 EASY DOMAIN CONFIGURATION - Just change the values below!
 
 const CONFIG = {
-    // API Configuration - Optimized for your setup
+    // 👇 CHANGE THESE VALUES TO UPDATE YOUR DOMAINS 👇
+    FRONTEND_DOMAIN: 'l-o-des1b.thteam.me',  // 👈 YOUR FRONTEND DOMAIN
+    BACKEND_URL: 'https://serverjs-production-0592.up.railway.app/api',  // 👈 YOUR BACKEND URL
+    
+    // 👆 ONLY CHANGE THE VALUES ABOVE - Everything else is automatic 👆
+    
+    // API Configuration - Automatically configured based on above
     API_BASE_URL: (() => {
         const hostname = window.location.hostname;
         
@@ -11,25 +17,9 @@ const CONFIG = {
             return 'http://localhost:2092/api';
         }
         
-        // Production - Check if backend has custom domain or use Railway
-        // If your backend is also on a custom domain, replace the URL below
-        if (hostname === 'l-o-des1b.thteam') {
-            // Option 1: If backend is on same domain with different port/path
-            // return 'https://lodes1b.thteam.me:2092/api';
-            
-            // Option 2: If backend is on different subdomain
-            // return 'https://api.lodes1b.thteam.me/api';
-            
-            // Option 3: If backend is still on Railway (current setup)
-            return 'https://serverjs-production-0592.up.railway.app/api';
-        }
-        
-        // Fallback for other domains
-        return 'https://serverjs-production-0592.up.railway.app/api';
+        // Production - automatically uses BACKEND_URL above
+        return CONFIG.BACKEND_URL;
     })(),
-    
-    // Railway backend API URL (HTTPS enabled) 
-    RAILWAY_API_URL: 'https://serverjs-production-0592.up.railway.app/api',
     
     // Application Settings
     APP_NAME: 'ES1 Class Organization',
