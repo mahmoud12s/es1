@@ -18,7 +18,7 @@ const CONFIG = {
         }
         
         // Production - automatically uses BACKEND_URL above
-        return CONFIG.BACKEND_URL;
+        return 'https://serverjs-production-0592.up.railway.app/api';
     })(),
     
     // Application Settings

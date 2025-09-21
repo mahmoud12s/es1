@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backend Connection Test - ES1 Class</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="config.js"></script>
+    <style>
+        .test-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-result {
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        .success { border-left-color: #28a745; background: #d4edda; }
+        .error { border-left-color: #dc3545; background: #f8d7da; }
+        .warning { border-left-color: #ffc107; background: #fff3cd; }
+        .info { border-left-color: #17a2b8; background: #d1ecf1; }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 10px 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .test-button:hover { background: #0056b3; }
+        .test-button:disabled { background: #6c757d; cursor: not-allowed; }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔧 Backend Connection Test</h1>
+        
+        <div class="test-result info">
+            <h3>📋 Current Configuration:</h3>
+            <div><strong>Frontend Domain:</strong> <span id="frontendDomain">Loading...</span></div>
+            <div><strong>Backend URL:</strong> <span id="backendUrl">Loading...</span></div>
+            <div><strong>Current Location:</strong> <span id="currentLocation">Loading...</span></div>
+        </div>
+        
+        <div class="test-result">
+            <h3>🧪 Connection Tests:</h3>
+            <button class="test-button" onclick="testHealthEndpoint()">Test Health Check</button>
+            <button class="test-button" onclick="testScheduleEndpoint()">Test Schedule API</button>
+            <button class="test-button" onclick="testSubjectsEndpoint()">Test Subjects API</button>
+            <button class="test-button" onclick="testCorsHeaders()">Test CORS Headers</button>
+            <button class="test-button" onclick="clearResults()">Clear Results</button>
+        </div>
+        
+        <div id="testResults">
+            <!-- Test results will appear here -->
+        </div>
+        
+        <div class="test-result warning">
+            <h3>⚠️ Common Issues & Solutions:</h3>
+            <ul>
+                <li><strong>CORS Error:</strong> Backend needs to allow your frontend domain</li>
+                <li><strong>Network Error:</strong> Backend server might be down</li>
+                <li><strong>404 Error:</strong> API endpoint doesn't exist</li>
+                <li><strong>Mixed Content:</strong> HTTP/HTTPS mismatch</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Update configuration display
+        function updateConfigDisplay() {
+            document.getElementById('frontendDomain').textContent = window.location.hostname;
+            document.getElementById('backendUrl').textContent = getApiUrl('');
+            document.getElementById('currentLocation').textContent = window.location.href;
+        }
+
+        function addResult(title, status, message, details = null) {
+            const resultsDiv = document.getElementById('testResults');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${status}`;
+            
+            let content = `<h4>${title}</h4><p>${message}</p>`;
+            if (details) {
+                content += `<pre>${JSON.stringify(details, null, 2)}</pre>`;
+            }
+            
+            resultDiv.innerHTML = content;
+            resultsDiv.appendChild(resultDiv);
+        }
+
+        function clearResults() {
+            document.getElementById('testResults').innerHTML = '';
+        }
+
+        async function testHealthEndpoint() {
+            try {
+                addResult('🔍 Testing Railway Backend...', 'info', 'Checking if Railway backend is responding...');
+                
+                // Test direct Railway URL first
+                const railwayUrl = 'https://serverjs-production-0592.up.railway.app/api/health';
+                console.log('Testing Railway backend directly:', railwayUrl);
+                
+                try {
+                    const directResponse = await fetch(railwayUrl, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (directResponse.ok) {
+                        const data = await directResponse.json();
+                        addResult('✅ Railway Backend Direct', 'success', 'Railway backend is running and responding!', data);
+                    } else {
+                        addResult('❌ Railway Backend Direct Failed', 'error', `Railway responded with status: ${directResponse.status} ${directResponse.statusText}`);
+                    }
+                } catch (directError) {
+                    addResult('❌ Railway Backend Direct Error', 'error', `Failed to connect directly to Railway: ${directError.message}`);
+                }
+                
+                // Test through config
+                const url = getApiUrl('/health');
+                console.log('Testing through config:', url);
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult('✅ Config-based Health Check', 'success', 'Backend accessible through config!', data);
+                } else {
+                    addResult('❌ Config-based Health Check Failed', 'error', `Config URL responded with status: ${response.status} ${response.statusText}`);
+                }
+            } catch (error) {
+                addResult('❌ Health Check Error', 'error', `Failed to connect to backend: ${error.message}`);
+                console.error('Health check error:', error);
+            }
+        }
+
+        async function testScheduleEndpoint() {
+            try {
+                addResult('🔍 Testing Schedule API...', 'info', 'Checking schedule endpoint...');
+                
+                const url = getApiUrl('/schedule');
+                const response = await fetch(url);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult('✅ Schedule API', 'success', `Schedule endpoint working! Found ${data.length} schedule items.`, data.slice(0, 3));
+                } else {
+                    addResult('❌ Schedule API Failed', 'error', `Status: ${response.status} ${response.statusText}`);
+                }
+            } catch (error) {
+                addResult('❌ Schedule API Error', 'error', `Error: ${error.message}`);
+            }
+        }
+
+        async function testSubjectsEndpoint() {
+            try {
+                addResult('🔍 Testing Subjects API...', 'info', 'Checking subjects endpoint...');
+                
+                const url = getApiUrl('/subjects');
+                const response = await fetch(url);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult('✅ Subjects API', 'success', `Subjects endpoint working! Found ${data.length} subjects.`, data.slice(0, 2));
+                } else {
+                    addResult('❌ Subjects API Failed', 'error', `Status: ${response.status} ${response.statusText}`);
+                }
+            } catch (error) {
+                addResult('❌ Subjects API Error', 'error', `Error: ${error.message}`);
+            }
+        }
+
+        async function testCorsHeaders() {
+            try {
+                addResult('🔍 Testing CORS Headers...', 'info', 'Checking cross-origin resource sharing...');
+                
+                const url = getApiUrl('/health');
+                const response = await fetch(url, {
+                    method: 'OPTIONS'
+                });
+                
+                const corsHeaders = {
+                    'Access-Control-Allow-Origin': response.headers.get('Access-Control-Allow-Origin'),
+                    'Access-Control-Allow-Methods': response.headers.get('Access-Control-Allow-Methods'),
+                    'Access-Control-Allow-Headers': response.headers.get('Access-Control-Allow-Headers')
+                };
+                
+                if (response.ok) {
+                    addResult('✅ CORS Headers', 'success', 'CORS is properly configured!', corsHeaders);
+                } else {
+                    addResult('❌ CORS Headers Failed', 'error', `Status: ${response.status}`, corsHeaders);
+                }
+            } catch (error) {
+                addResult('❌ CORS Test Error', 'error', `Error: ${error.message}`);
+            }
+        }
+
+        // Auto-run basic tests on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateConfigDisplay();
+            
+            setTimeout(function() {
+                console.log('🔧 Auto-running connection tests...');
+                testHealthEndpoint();
+            }, 1000);
+        });
+
+        // Manual test function
+        window.runAllTests = function() {
+            clearResults();
+            setTimeout(testHealthEndpoint, 100);
+            setTimeout(testScheduleEndpoint, 1000);
+            setTimeout(testSubjectsEndpoint, 2000);
+            setTimeout(testCorsHeaders, 3000);
+        };
+    </script>
+</body>
+</html>
