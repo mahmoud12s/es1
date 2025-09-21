@@ -6,6 +6,7 @@
     <title>ES1 Class Organization</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="languages.js"></script>
 </head>
 <body>
     <!-- Navigation -->
@@ -16,21 +17,26 @@
             </div>
             <ul class="nav-menu">
                 <li class="nav-item">
-                    <a href="#home" class="nav-link active">Home</a>
+                    <a href="#home" class="nav-link active" data-text="navHome">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a href="#schedule" class="nav-link">Weekly Program</a>
+                    <a href="#schedule" class="nav-link" data-text="navSchedule">Weekly Program</a>
                 </li>
                 <li class="nav-item">
-                    <a href="#subjects" class="nav-link">Subjects</a>
+                    <a href="#subjects" class="nav-link" data-text="navSubjects">Subjects</a>
                 </li>
                 <li class="nav-item">
-                    <a href="#agenda" class="nav-link">Agenda</a>
+                    <a href="#agenda" class="nav-link" data-text="navAgenda">Agenda</a>
                 </li>
                 <li class="nav-item">
-                    <a href="login.html" class="nav-link">Admin Login</a>
+                    <a href="login.html" class="nav-link" data-text="navAdminLogin">Admin Login</a>
                 </li>
             </ul>
+            <div class="nav-language">
+                <button id="languageToggle" class="btn btn-secondary" style="padding: 8px 16px; margin-left: 1rem;">
+                    <i class="fas fa-language"></i> <span id="currentLang">EN</span>
+                </button>
+            </div>
             <div class="hamburger">
                 <span class="bar"></span>
                 <span class="bar"></span>
@@ -42,11 +48,11 @@
     <!-- Hero Section -->
     <section id="home" class="hero">
         <div class="hero-content">
-            <h1>Welcome to ES1 Class Organization</h1>
-            <p>Your complete learning management system</p>
+            <h1 data-text="heroTitle">Welcome to ES1 Class Organization</h1>
+            <p data-text="heroSubtitle">Your complete learning management system</p>
             <div class="hero-buttons">
-                <a href="#schedule" class="btn btn-primary">View Schedule</a>
-                <a href="#subjects" class="btn btn-secondary">Browse Subjects</a>
+                <a href="#schedule" class="btn btn-primary" data-text="heroViewSchedule">View Schedule</a>
+                <a href="#subjects" class="btn btn-secondary" data-text="heroBrowseSubjects">Browse Subjects</a>
             </div>
         </div>
     </section>
@@ -54,12 +60,12 @@
     <!-- Weekly Program Section -->
     <section id="schedule" class="schedule-section">
         <div class="container">
-            <h2 class="section-title">Weekly Program</h2>
+            <h2 class="section-title" data-text="sectionSchedule">Weekly Program</h2>
             <div class="schedule-grid" id="scheduleContainer">
                 <!-- Schedule will be loaded dynamically from database -->
                 <div class="empty-message" style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: #666;">
                     <i class="fas fa-calendar-alt" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
-                    <p>No schedule available yet. Admin can add classes through the admin panel.</p>
+                    <p data-text="emptySchedule">No schedule available yet. Admin can add classes through the admin panel.</p>
                 </div>
             </div>
         </div>
@@ -68,12 +74,12 @@
     <!-- Subjects Section -->
     <section id="subjects" class="subjects-section">
         <div class="container">
-            <h2 class="section-title">Subjects</h2>
+            <h2 class="section-title" data-text="sectionSubjects">Subjects</h2>
             <div class="subjects-grid" id="subjectsContainer">
                 <!-- Subjects will be loaded dynamically from database -->
                 <div class="empty-message" style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: #666;">
                     <i class="fas fa-book-open" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
-                    <p>No subjects available yet. Admin can add subjects through the admin panel.</p>
+                    <p data-text="emptySubjects">No subjects available yet. Admin can add subjects through the admin panel.</p>
                 </div>
             </div>
         </div>
@@ -82,12 +88,12 @@
     <!-- Homework Agenda Section -->
     <section id="agenda" class="agenda-section">
         <div class="container">
-            <h2 class="section-title">Homework Agenda</h2>
+            <h2 class="section-title" data-text="sectionAgenda">Homework Agenda</h2>
             <div class="agenda-grid" id="agendaContainer">
                 <!-- Homework assignments will be loaded dynamically from database -->
                 <div class="empty-message" style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: #666;">
                     <i class="fas fa-tasks" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
-                    <p>No homework assignments available yet. Admin can add homework through the admin panel.</p>
+                    <p data-text="emptyHomework">No homework assignments available yet. Admin can add homework through the admin panel.</p>
                 </div>
             </div>
         </div>
@@ -96,7 +102,7 @@
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2024 ES1 Class Organization. All rights reserved.</p>
+            <p data-text="footerCopyright">&copy; 2024 ES1 Class Organization. All rights reserved.</p>
         </div>
     </footer>
 

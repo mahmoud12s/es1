@@ -167,6 +167,384 @@ function getFromLocalStorage(key) {
     }
 }
 
+// Data persistence layer
+const DataStore = {
+    // Cache for preventing data loss on refresh
+    cache: new Map(),
+    
+    // Store data with automatic backup
+    set(key, data) {
+        this.cache.set(key, data);
+        localStorage.setItem(`es1_cache_${key}`, JSON.stringify({
+            data: data,
+            timestamp: Date.now()
+        }));
+    },
+    
+    // Retrieve data from cache or localStorage
+    get(key) {
+        // First check in-memory cache
+        if (this.cache.has(key)) {
+            return this.cache.get(key);
+        }
+        
+        // Then check localStorage
+        try {
+            const stored = localStorage.getItem(`es1_cache_${key}`);
+            if (stored) {
+                const parsed = JSON.parse(stored);
+                // Check if data is less than 1 hour old
+                if (Date.now() - parsed.timestamp < 3600000) {
+                    this.cache.set(key, parsed.data);
+                    return parsed.data;
+                }
+            }
+        } catch (error) {
+            console.error('Error retrieving cached data:', error);
+        }
+        
+        return null;
+    },
+    
+    // Clear specific cache entry
+    clear(key) {
+        this.cache.delete(key);
+        localStorage.removeItem(`es1_cache_${key}`);
+    },
+    
+    // Clear all cache
+    clearAll() {
+        this.cache.clear();
+        Object.keys(localStorage).forEach(key => {
+            if (key.startsWith('es1_cache_')) {
+                localStorage.removeItem(key);
+            }
+        });
+    }
+};
+
+// File upload functionality
+const FileUploader = {
+    selectedFiles: [],
+    currentSubject: null,
+    currentChapter: null,
+    
+    init() {
+        this.setupEventListeners();
+        this.loadSubjectsForUpload();
+    },
+    
+    setupEventListeners() {
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const subjectSelect = document.getElementById('fileUploadSubjectSelect');
+        const chapterSelect = document.getElementById('fileUploadChapterSelect');
+        const uploadBtn = document.getElementById('uploadBtn');
+        
+        if (uploadZone) {
+            uploadZone.addEventListener('click', () => fileInput.click());
+            uploadZone.addEventListener('dragover', this.handleDragOver.bind(this));
+            uploadZone.addEventListener('dragleave', this.handleDragLeave.bind(this));
+            uploadZone.addEventListener('drop', this.handleDrop.bind(this));
+        }
+        
+        if (fileInput) {
+            fileInput.addEventListener('change', this.handleFileSelect.bind(this));
+        }
+        
+        if (subjectSelect) {
+            subjectSelect.addEventListener('change', this.handleSubjectChange.bind(this));
+        }
+        
+        if (chapterSelect) {
+            chapterSelect.addEventListener('change', this.handleChapterChange.bind(this));
+        }
+        
+        if (uploadBtn) {
+            uploadBtn.addEventListener('click', this.uploadFiles.bind(this));
+        }
+    },
+    
+    handleDragOver(e) {
+        e.preventDefault();
+        document.getElementById('uploadZone').classList.add('dragover');
+    },
+    
+    handleDragLeave(e) {
+        e.preventDefault();
+        document.getElementById('uploadZone').classList.remove('dragover');
+    },
+    
+    handleDrop(e) {
+        e.preventDefault();
+        document.getElementById('uploadZone').classList.remove('dragover');
+        const files = Array.from(e.dataTransfer.files);
+        this.processFiles(files);
+    },
+    
+    handleFileSelect(e) {
+        const files = Array.from(e.target.files);
+        this.processFiles(files);
+    },
+    
+    processFiles(files) {
+        const userRole = localStorage.getItem('userRole');
+        
+        // Filter files based on user role
+        if (userRole === 'teacher') {
+            files = files.filter(file => file.type === 'application/pdf');
+            if (files.length !== e.target.files.length) {
+                showNotification(getText('uploadTeacherRestriction'), 'error');
+            }
+        }
+        
+        this.selectedFiles = files;
+        this.displaySelectedFiles();
+        
+        if (files.length > 0) {
+            document.getElementById('uploadBtn').style.display = 'block';
+        }
+    },
+    
+    displaySelectedFiles() {
+        const fileList = document.getElementById('fileList');
+        fileList.innerHTML = '';
+        
+        this.selectedFiles.forEach((file, index) => {
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            fileItem.innerHTML = `
+                <div class="file-info">
+                    <div class="file-name">${file.name}</div>
+                    <div class="file-size">${this.formatFileSize(file.size)}</div>
+                </div>
+                <button class="file-remove" onclick="FileUploader.removeFile(${index})">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            fileList.appendChild(fileItem);
+        });
+    },
+    
+    removeFile(index) {
+        this.selectedFiles.splice(index, 1);
+        this.displaySelectedFiles();
+        
+        if (this.selectedFiles.length === 0) {
+            document.getElementById('uploadBtn').style.display = 'none';
+        }
+    },
+    
+    formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    },
+    
+    async loadSubjectsForUpload() {
+        try {
+            const response = await fetch(getApiUrl('/subjects'));
+            const subjects = await response.json();
+            
+            const subjectSelect = document.getElementById('fileUploadSubjectSelect');
+            if (subjectSelect) {
+                subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+                subjects.forEach(subject => {
+                    const option = document.createElement('option');
+                    option.value = subject._id;
+                    option.textContent = subject.name;
+                    subjectSelect.appendChild(option);
+                });
+            }
+        } catch (error) {
+            console.error('Error loading subjects for upload:', error);
+        }
+    },
+    
+    async handleSubjectChange(e) {
+        const subjectId = e.target.value;
+        const chapterSelect = document.getElementById('fileUploadChapterSelect');
+        
+        if (!subjectId) {
+            chapterSelect.disabled = true;
+            chapterSelect.innerHTML = '<option value="">Select Chapter</option>';
+            document.getElementById('fileUploadArea').style.display = 'none';
+            return;
+        }
+        
+        try {
+            const response = await fetch(getApiUrl(`/subjects/${subjectId}`));
+            const subject = await response.json();
+            
+            chapterSelect.innerHTML = '<option value="">Select Chapter</option>';
+            subject.chapters.forEach(chapter => {
+                const option = document.createElement('option');
+                option.value = chapter._id;
+                option.textContent = chapter.title;
+                chapterSelect.appendChild(option);
+            });
+            
+            chapterSelect.disabled = false;
+            this.currentSubject = subject;
+        } catch (error) {
+            console.error('Error loading chapters:', error);
+            showNotification('Error loading chapters', 'error');
+        }
+    },
+    
+    handleChapterChange(e) {
+        const chapterId = e.target.value;
+        const userRole = localStorage.getItem('userRole');
+        
+        if (chapterId) {
+            this.currentChapter = this.currentSubject.chapters.find(ch => ch._id === chapterId);
+            document.getElementById('fileUploadArea').style.display = 'block';
+            
+            // Show teacher restriction message if applicable
+            const restriction = document.getElementById('teacherRestriction');
+            if (userRole === 'teacher') {
+                restriction.style.display = 'block';
+                document.getElementById('fileInput').accept = '.pdf';
+            } else {
+                restriction.style.display = 'none';
+                document.getElementById('fileInput').accept = '.jpg,.jpeg,.png,.gif,.pdf';
+            }
+            
+            this.loadChapterFiles();
+        } else {
+            document.getElementById('fileUploadArea').style.display = 'none';
+        }
+    },
+    
+    async uploadFiles() {
+        if (this.selectedFiles.length === 0 || !this.currentSubject || !this.currentChapter) {
+            showNotification('Please select files and a chapter', 'error');
+            return;
+        }
+        
+        const formData = new FormData();
+        this.selectedFiles.forEach(file => {
+            formData.append('files', file);
+        });
+        
+        try {
+            const token = localStorage.getItem('userToken');
+            const response = await fetch(getApiUrl(`/subjects/${this.currentSubject._id}/chapters/${this.currentChapter._id}/upload`), {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                showNotification(getText('msgFilesUploaded'), 'success');
+                this.selectedFiles = [];
+                this.displaySelectedFiles();
+                document.getElementById('uploadBtn').style.display = 'none';
+                this.loadChapterFiles();
+                
+                // Clear cache to force refresh
+                DataStore.clear('subjects');
+            } else {
+                const error = await response.json();
+                showNotification(error.message || 'Upload failed', 'error');
+            }
+        } catch (error) {
+            console.error('Upload error:', error);
+            showNotification('Upload failed', 'error');
+        }
+    },
+    
+    async loadChapterFiles() {
+        if (!this.currentSubject || !this.currentChapter) return;
+        
+        const display = document.getElementById('chapterFilesDisplay');
+        display.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">Loading files...</p>';
+        
+        try {
+            const response = await fetch(getApiUrl(`/subjects/${this.currentSubject._id}`));
+            const subject = await response.json();
+            const chapter = subject.chapters.find(ch => ch._id === this.currentChapter._id);
+            
+            if (!chapter) {
+                display.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">Chapter not found.</p>';
+                return;
+            }
+            
+            const allFiles = [...(chapter.images || []), ...(chapter.pdfs || [])];
+            
+            if (allFiles.length === 0) {
+                display.innerHTML = `<p style="text-align: center; color: #666; padding: 2rem;" data-text="chapterNoFiles">No files uploaded yet</p>`;
+                return;
+            }
+            
+            display.innerHTML = '<div class="chapter-files-grid"></div>';
+            const grid = display.querySelector('.chapter-files-grid');
+            
+            allFiles.forEach(file => {
+                const isImage = file.mimetype && file.mimetype.startsWith('image/');
+                const fileCard = document.createElement('div');
+                fileCard.className = `file-card ${isImage ? 'image-card' : 'pdf-card'}`;
+                
+                fileCard.innerHTML = `
+                    <div class="file-icon">
+                        <i class="fas ${isImage ? 'fa-image' : 'fa-file-pdf'}"></i>
+                    </div>
+                    <div class="file-name">${file.originalname}</div>
+                    <div class="file-size">${this.formatFileSize(file.size)}</div>
+                    <div class="file-actions">
+                        <button class="file-view" onclick="FileUploader.viewFile('${this.currentSubject._id}', '${file.filename}')">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                        <button class="file-delete" onclick="FileUploader.deleteFile('${file._id}')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                `;
+                
+                grid.appendChild(fileCard);
+            });
+            
+        } catch (error) {
+            console.error('Error loading chapter files:', error);
+            display.innerHTML = '<p style="text-align: center; color: #ff0000; padding: 2rem;">Error loading files</p>';
+        }
+    },
+    
+    viewFile(subjectId, filename) {
+        const fileUrl = getApiUrl(`/files/${subjectId}/${filename}`);
+        window.open(fileUrl, '_blank');
+    },
+    
+    async deleteFile(fileId) {
+        if (!confirm(getText('msgDeleteConfirm') + ' file?')) return;
+        
+        try {
+            const token = localStorage.getItem('userToken');
+            const response = await fetch(getApiUrl(`/subjects/${this.currentSubject._id}/chapters/${this.currentChapter._id}/files/${fileId}`), {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            if (response.ok) {
+                showNotification('File ' + getText('msgDeleted'), 'success');
+                this.loadChapterFiles();
+            } else {
+                showNotification('Error deleting file', 'error');
+            }
+        } catch (error) {
+            console.error('Delete error:', error);
+            showNotification('Error deleting file', 'error');
+        }
+    }
+};
+
 // Initialize page-specific functionality
 document.addEventListener('DOMContentLoaded', () => {
     const currentPage = window.location.pathname.split('/').pop();
@@ -208,6 +586,7 @@ function initAdminPage() {
     // Initialize admin panel
     checkAdminAuth();
     loadAdminData();
+    FileUploader.init();
 }
 
 function initSubjectDetailPage() {
@@ -341,8 +720,14 @@ async function loadScheduleFromAPI() {
 // Load subjects from API
 async function loadSubjectsFromAPI() {
     try {
-        const response = await fetch(getApiUrl('/subjects'));
-        const subjects = await response.json();
+        // Check cache first
+        let subjects = DataStore.get('subjects');
+        
+        if (!subjects) {
+            const response = await fetch(getApiUrl('/subjects'));
+            subjects = await response.json();
+            DataStore.set('subjects', subjects);
+        }
         
         const container = document.getElementById('subjectsContainer');
         if (!container) return;

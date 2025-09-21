@@ -6,44 +6,43 @@
     <title>Admin Login - ES1 Class</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="languages.js"></script>
 </head>
 <body>
     <div class="login-container">
         <div class="login-card">
             <div class="login-header">
-                <h2>Admin Login</h2>
-                <p>Access the ES1 Class management system</p>
+                <h2 data-text="loginTitle">Admin Login</h2>
+                <p data-text="loginSubtitle">Access the ES1 Class management system</p>
             </div>
             
             <form id="loginForm" class="login-form">
                 <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" name="username" required>
+                    <label for="username" data-text="loginUsername">Username</label>
+                    <input type="text" id="username" name="username" required data-placeholder="loginUsername">
                 </div>
                 
                 <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
+                    <label for="password" data-text="loginPassword">Password</label>
+                    <input type="password" id="password" name="password" required data-placeholder="loginPassword">
                 </div>
                 
                 <button type="submit" class="login-btn">
-                    <i class="fas fa-sign-in-alt"></i> Login
+                    <i class="fas fa-sign-in-alt"></i> <span data-text="loginButton">Login</span>
                 </button>
             </form>
             
             <div class="login-links">
-                <a href="index.html">← Back to Home</a>
+                <a href="index.html" data-text="loginBackHome">← Back to Home</a>
             </div>
         </div>
     </div>
     
-    <!-- Demo Credentials Info -->
-    <div style="position: fixed; bottom: 20px; left: 20px; background: #f8f9fa; padding: 1rem; border-radius: 8px; border: 1px solid #e9ecef; max-width: 300px;">
-        <h4 style="margin: 0 0 0.5rem 0; color: #000;">Demo Credentials:</h4>
-        <p style="margin: 0; font-size: 0.9rem; color: #666;">
-            <strong>Admin:</strong> admin / admin123<br>
-            <strong>Teacher:</strong> teacher / teacher123
-        </p>
+    <!-- Language Toggle -->
+    <div style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+        <button id="languageToggle" class="btn btn-secondary" style="padding: 8px 16px;">
+            <i class="fas fa-language"></i> <span id="currentLang">EN</span>
+        </button>
     </div>
 
     <script src="config.js"></script>

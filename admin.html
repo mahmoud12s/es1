@@ -6,6 +6,7 @@
     <title>Admin Panel - ES1 Class</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="languages.js"></script>
     <script src="config.js"></script>
 </head>
 <body>
@@ -13,11 +14,16 @@
     <div class="admin-header">
         <div class="container">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h1>ES1 Class - Admin Panel</h1>
-                <div>
-                    <span id="welcomeUser" style="margin-right: 1rem;">Welcome, Admin</span>
+                <h1 data-text="adminTitle">ES1 Class - Admin Panel</h1>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="languageToggle" class="btn btn-secondary" style="padding: 8px 16px;">
+                        <i class="fas fa-language"></i> <span id="currentLang">EN</span>
+                    </button>
+                    <span id="welcomeUser" style="margin-right: 1rem;">
+                        <span data-text="adminWelcome">Welcome</span>, Admin
+                    </span>
                     <button onclick="logout()" class="btn btn-secondary">
-                        <i class="fas fa-sign-out-alt"></i> Logout
+                        <i class="fas fa-sign-out-alt"></i> <span data-text="adminLogout">Logout</span>
                     </button>
                 </div>
             </div>
@@ -27,11 +33,12 @@
     <!-- Admin Navigation -->
     <nav class="admin-nav">
         <ul>
-            <li><a href="#dashboard" class="admin-nav-link active">Dashboard</a></li>
-            <li><a href="#schedule" class="admin-nav-link">Schedule Management</a></li>
-            <li><a href="#subjects" class="admin-nav-link">Subjects & Chapters</a></li>
-            <li><a href="#users" class="admin-nav-link">User Management</a></li>
-            <li><a href="#homework" class="admin-nav-link">Homework</a></li>
+            <li><a href="#dashboard" class="admin-nav-link active" data-text="adminDashboard">Dashboard</a></li>
+            <li><a href="#schedule" class="admin-nav-link" data-text="adminScheduleManagement">Schedule Management</a></li>
+            <li><a href="#subjects" class="admin-nav-link" data-text="adminSubjectsChapters">Subjects & Chapters</a></li>
+            <li><a href="#chapter-files" class="admin-nav-link">Chapter Files</a></li>
+            <li><a href="#users" class="admin-nav-link" data-text="adminUserManagement">User Management</a></li>
+            <li><a href="#homework" class="admin-nav-link" data-text="adminHomework">Homework</a></li>
         </ul>
     </nav>
 
@@ -156,6 +163,57 @@
                     <h4>Existing Subjects & Chapters</h4>
                     <div id="existingSubjects">
                         <!-- Will be loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chapter Files Management Section -->
+        <section id="chapter-files" class="admin-section" style="display: none;">
+            <h3>Chapter Files Management</h3>
+            <div class="admin-grid">
+                <div class="admin-card">
+                    <h4>Select Chapter for File Upload</h4>
+                    <form id="selectChapterForm">
+                        <div class="form-group">
+                            <label>Subject</label>
+                            <select id="fileUploadSubjectSelect" required>
+                                <option value="">Select Subject</option>
+                                <!-- Options will be loaded dynamically -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Chapter</label>
+                            <select id="fileUploadChapterSelect" required disabled>
+                                <option value="">Select Chapter</option>
+                                <!-- Options will be loaded dynamically -->
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="admin-card">
+                    <h4>Upload Files</h4>
+                    <div id="fileUploadArea" style="display: none;">
+                        <div class="upload-zone" id="uploadZone">
+                            <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: #ccc; margin-bottom: 1rem;"></i>
+                            <p data-text="uploadDragDrop">Drag and drop files here or click to select</p>
+                            <small data-text="uploadMaxSize">Maximum file size: 10MB</small><br>
+                            <small data-text="uploadAllowedTypes">Allowed types: Images (JPG, PNG, GIF) and PDF files</small>
+                            <div id="teacherRestriction" style="display: none; color: #ff6b6b; margin-top: 0.5rem;">
+                                <small data-text="uploadTeacherRestriction">Teachers can only upload PDF files</small>
+                            </div>
+                        </div>
+                        <input type="file" id="fileInput" multiple accept=".jpg,.jpeg,.png,.gif,.pdf" style="display: none;">
+                        <div id="fileList" style="margin-top: 1rem;"></div>
+                        <button id="uploadBtn" class="btn btn-primary" style="margin-top: 1rem; display: none;" data-text="btnUploadFiles">Upload Files</button>
+                    </div>
+                </div>
+            </div>
+            <div class="admin-grid" style="margin-top: 2rem;">
+                <div class="admin-card" style="grid-column: 1 / -1;">
+                    <h4>Chapter Files</h4>
+                    <div id="chapterFilesDisplay">
+                        <p style="text-align: center; color: #666; padding: 2rem;">Select a chapter to view its files.</p>
                     </div>
                 </div>
             </div>
