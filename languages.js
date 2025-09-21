@@ -246,7 +246,7 @@ const LANGUAGES = {
         roleStudent: 'Étudiant',
         
         // Footer
-        footerCopyright: '© 2024 Organisation de Classe ES1. Tous droits réservés.',
+        footerCopyright: 'MADE/POWERED BY MAHMOUD',
         
         // Chapters
         chaptersTitle: 'Chapitres',
@@ -338,4 +338,3 @@ if (typeof module !== 'undefined' && module.exports) {
     window.updatePageLanguage = updatePageLanguage;
     window.toggleLanguage = toggleLanguage;
 }
-
