@@ -692,17 +692,18 @@ async function loadScheduleFromAPI() {
         // Clear empty message
         container.innerHTML = '';
         
-        // Group schedule by day
+        // Group schedule by day (excluding Friday)
         const daySchedule = {
             'monday': [],
             'tuesday': [],
             'wednesday': [],
-            'thursday': [],
-            'friday': []
+            'thursday': []
         };
         
         scheduleData.forEach(item => {
             const dayKey = item.day.toLowerCase();
+            // Skip Friday items
+            if (dayKey === 'friday') return;
             if (daySchedule[dayKey]) {
                 daySchedule[dayKey].push(item);
             }
