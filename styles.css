@@ -36,6 +36,19 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: relative;
+}
+
+.nav-center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 .nav-logo h2 {
@@ -48,6 +61,7 @@ body {
     display: flex;
     list-style: none;
     gap: 2rem;
+    align-items: center;
 }
 
 .nav-link {
@@ -783,13 +797,28 @@ body {
     align-items: center;
 }
 
+.nav-language .btn {
+    background-color: #ffffff;
+    color: #000000;
+    border: 2px solid #ffffff;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.nav-language .btn:hover {
+    background-color: #f8f9fa;
+    color: #000000;
+    border-color: #f8f9fa;
+    transform: translateY(-1px);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .hamburger {
         display: flex;
     }
     
-    .nav-menu {
+    .nav-center {
         position: fixed;
         left: -100%;
         top: 70px;
@@ -799,14 +828,25 @@ body {
         text-align: center;
         transition: 0.3s;
         padding: 2rem 0;
+        justify-content: flex-start;
     }
     
-    .nav-menu.active {
+    .nav-center.active {
         left: 0;
+    }
+    
+    .nav-menu {
+        flex-direction: column;
+        width: 100%;
     }
     
     .nav-menu li {
         margin: 1rem 0;
+    }
+    
+    .nav-right {
+        flex-direction: column;
+        gap: 0.5rem;
     }
     
     .hero-content h1 {

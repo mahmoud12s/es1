@@ -6,6 +6,7 @@
     <title>Subject Details - ES1 Class</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="languages.js"></script>
     <script src="config.js"></script>
 </head>
 <body>
@@ -17,21 +18,26 @@
             </div>
             <ul class="nav-menu">
                 <li class="nav-item">
-                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="index.html" class="nav-link" data-text="navHome">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a href="index.html#schedule" class="nav-link">Weekly Program</a>
+                    <a href="index.html#schedule" class="nav-link" data-text="navSchedule">Weekly Program</a>
                 </li>
                 <li class="nav-item">
-                    <a href="index.html#subjects" class="nav-link">Subjects</a>
+                    <a href="index.html#subjects" class="nav-link" data-text="navSubjects">Subjects</a>
                 </li>
                 <li class="nav-item">
-                    <a href="index.html#agenda" class="nav-link">Agenda</a>
+                    <a href="index.html#agenda" class="nav-link" data-text="navAgenda">Agenda</a>
                 </li>
                 <li class="nav-item">
-                    <a href="login.html" class="nav-link">Admin Login</a>
+                    <a href="login.html" class="nav-link" data-text="navAdminLogin">Admin Login</a>
                 </li>
             </ul>
+            <div class="nav-language">
+                <button id="languageToggle" class="btn btn-secondary" style="padding: 8px 16px; margin-left: 1rem;">
+                    <i class="fas fa-language"></i> <span id="currentLang">EN</span>
+                </button>
+            </div>
             <div class="hamburger">
                 <span class="bar"></span>
                 <span class="bar"></span>
@@ -109,7 +115,7 @@
 
         async function loadSubjectDetails(subject) {
             try {
-                const response = await fetch(`/api/subjects/${subject}`);
+                const response = await fetch(getApiUrl(`/subjects/${subject}`));
                 
                 if (!response.ok) {
                     showNotification('Subject not found', 'error');

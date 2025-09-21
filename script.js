@@ -1,17 +1,17 @@
 // Mobile Navigation Toggle
 const hamburger = document.querySelector('.hamburger');
-const navMenu = document.querySelector('.nav-menu');
+const navCenter = document.querySelector('.nav-center');
 
-if (hamburger && navMenu) {
+if (hamburger && navCenter) {
     hamburger.addEventListener('click', () => {
         hamburger.classList.toggle('active');
-        navMenu.classList.toggle('active');
+        navCenter.classList.toggle('active');
     });
 
     // Close mobile menu when clicking on a link
     document.querySelectorAll('.nav-link').forEach(n => n.addEventListener('click', () => {
         hamburger.classList.remove('active');
-        navMenu.classList.remove('active');
+        navCenter.classList.remove('active');
     }));
 }
 
@@ -292,8 +292,9 @@ const FileUploader = {
         
         // Filter files based on user role
         if (userRole === 'teacher') {
+            const originalLength = files.length;
             files = files.filter(file => file.type === 'application/pdf');
-            if (files.length !== e.target.files.length) {
+            if (files.length !== originalLength) {
                 showNotification(getText('uploadTeacherRestriction'), 'error');
             }
         }
