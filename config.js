@@ -13,7 +13,7 @@ const CONFIG = {
         
         // Production - Check if backend has custom domain or use Railway
         // If your backend is also on a custom domain, replace the URL below
-        if (hostname === 'lodes1b.thteam.me') {
+        if (hostname === 'l-o-des1b.thteam') {
             // Option 1: If backend is on same domain with different port/path
             // return 'https://lodes1b.thteam.me:2092/api';
             
