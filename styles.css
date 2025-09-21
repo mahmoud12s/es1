@@ -51,6 +51,23 @@ body.nav-open {
     justify-content: center;
 }
 
+/* Ensure nav-center is visible on desktop */
+@media (min-width: 769px) {
+    .nav-center {
+        position: static !important;
+        left: auto !important;
+        top: auto !important;
+        flex-direction: row !important;
+        background-color: transparent !important;
+        width: auto !important;
+        height: auto !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        display: flex !important;
+        justify-content: center !important;
+    }
+}
+
 .nav-right {
     display: flex;
     align-items: center;
@@ -89,6 +106,13 @@ body.nav-open {
     display: none;
     flex-direction: column;
     cursor: pointer;
+    padding: 5px;
+    border-radius: 3px;
+    transition: background-color 0.3s ease;
+}
+
+.hamburger:hover {
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .bar {
@@ -964,6 +988,7 @@ body.nav-open {
         z-index: 1000;
         overflow-y: auto;
         box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        display: flex; /* Ensure it's flex even when hidden */
     }
     
     .nav-center.active {

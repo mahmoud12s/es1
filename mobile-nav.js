@@ -1,94 +1,87 @@
-// Mobile Navigation - Standalone Script
-// This script ensures mobile navigation works on all pages
-
-(function() {
-    'use strict';
+// Mobile Navigation - Clean and Simple
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔧 Mobile Navigation: DOM loaded');
     
-    let isInitialized = false;
-    
-    function initMobileNav() {
-        if (isInitialized) {
-            console.log('Mobile navigation already initialized');
-            return;
-        }
-        
-        console.log('Initializing mobile navigation...');
-        
+    // Wait a bit for all elements to render
+    setTimeout(function() {
         const hamburger = document.querySelector('.hamburger');
         const navCenter = document.querySelector('.nav-center');
         
+        console.log('🔧 Mobile Navigation: Elements found', {
+            hamburger: !!hamburger,
+            navCenter: !!navCenter
+        });
+        
         if (!hamburger || !navCenter) {
-            console.warn('Mobile navigation elements not found, retrying in 100ms...');
-            setTimeout(initMobileNav, 100);
+            console.warn('🔧 Mobile Navigation: Elements not found, retrying...');
+            setTimeout(arguments.callee, 100);
             return;
         }
         
-        console.log('Mobile navigation elements found, setting up event listeners');
+        // Ensure menu starts closed
+        hamburger.classList.remove('active');
+        navCenter.classList.remove('active');
+        document.body.classList.remove('nav-open');
         
-        // Remove any existing listeners to prevent duplicates
-        const newHamburger = hamburger.cloneNode(true);
-        hamburger.parentNode.replaceChild(newHamburger, hamburger);
+        console.log('🔧 Mobile Navigation: Setting up click handlers');
         
-        // Add click handler for hamburger menu
-        newHamburger.addEventListener('click', function(e) {
+        // Hamburger click handler
+        hamburger.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            console.log('Hamburger menu clicked');
             
-            newHamburger.classList.toggle('active');
-            navCenter.classList.toggle('active');
-            document.body.classList.toggle('nav-open');
+            console.log('🔧 Mobile Navigation: Hamburger clicked');
+            
+            const isActive = hamburger.classList.contains('active');
+            
+            if (isActive) {
+                // Close menu
+                hamburger.classList.remove('active');
+                navCenter.classList.remove('active');
+                document.body.classList.remove('nav-open');
+                console.log('🔧 Mobile Navigation: Menu closed');
+            } else {
+                // Open menu
+                hamburger.classList.add('active');
+                navCenter.classList.add('active');
+                document.body.classList.add('nav-open');
+                console.log('🔧 Mobile Navigation: Menu opened');
+            }
         });
         
-        // Close mobile menu when clicking on a link
-        document.querySelectorAll('.nav-link').forEach(link => {
+        // Close menu when clicking nav links
+        document.querySelectorAll('.nav-link').forEach(function(link) {
             link.addEventListener('click', function() {
-                console.log('Nav link clicked, closing mobile menu');
-                newHamburger.classList.remove('active');
+                console.log('🔧 Mobile Navigation: Nav link clicked, closing menu');
+                hamburger.classList.remove('active');
                 navCenter.classList.remove('active');
                 document.body.classList.remove('nav-open');
             });
         });
         
-        // Close mobile menu when clicking outside
+        // Close menu when clicking outside
         document.addEventListener('click', function(e) {
-            if (!navCenter.contains(e.target) && !newHamburger.contains(e.target)) {
-                newHamburger.classList.remove('active');
-                navCenter.classList.remove('active');
-                document.body.classList.remove('nav-open');
+            if (!navCenter.contains(e.target) && !hamburger.contains(e.target)) {
+                if (hamburger.classList.contains('active')) {
+                    console.log('🔧 Mobile Navigation: Clicked outside, closing menu');
+                    hamburger.classList.remove('active');
+                    navCenter.classList.remove('active');
+                    document.body.classList.remove('nav-open');
+                }
             }
         });
         
-        // Handle escape key
+        // Close menu with escape key
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                newHamburger.classList.remove('active');
+            if (e.key === 'Escape' && hamburger.classList.contains('active')) {
+                console.log('🔧 Mobile Navigation: Escape pressed, closing menu');
+                hamburger.classList.remove('active');
                 navCenter.classList.remove('active');
                 document.body.classList.remove('nav-open');
             }
         });
         
-        isInitialized = true;
-        console.log('Mobile navigation initialized successfully');
-    }
-    
-    // Initialize when DOM is ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(initMobileNav, 200);
-        });
-    } else {
-        setTimeout(initMobileNav, 200);
-    }
-    
-    // Also initialize on window load as backup
-    window.addEventListener('load', function() {
-        if (!isInitialized) {
-            setTimeout(initMobileNav, 100);
-        }
-    });
-    
-    // Expose function globally for manual initialization if needed
-    window.initMobileNavigation = initMobileNav;
-    
-})();
+        console.log('🔧 Mobile Navigation: Initialized successfully');
+        
+    }, 300); // Wait 300ms for elements to be ready
+});

@@ -122,52 +122,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Subject detail page loaded');
             
-            // Ensure mobile navigation is working
-            setTimeout(() => {
-                console.log('Initializing mobile navigation for subject detail page');
-                
-                const hamburger = document.querySelector('.hamburger');
-                const navCenter = document.querySelector('.nav-center');
-                
-                if (hamburger && navCenter) {
-                    // Remove any existing listeners
-                    hamburger.onclick = null;
-                    
-                    // Add click handler
-                    hamburger.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log('Hamburger clicked on subject detail page');
-                        
-                        hamburger.classList.toggle('active');
-                        navCenter.classList.toggle('active');
-                        document.body.classList.toggle('nav-open');
-                    });
-                    
-                    // Close menu when clicking on nav links
-                    document.querySelectorAll('.nav-link').forEach(link => {
-                        link.addEventListener('click', function() {
-                            hamburger.classList.remove('active');
-                            navCenter.classList.remove('active');
-                            document.body.classList.remove('nav-open');
-                        });
-                    });
-                    
-                    // Close menu when clicking outside
-                    document.addEventListener('click', function(e) {
-                        if (!navCenter.contains(e.target) && !hamburger.contains(e.target)) {
-                            hamburger.classList.remove('active');
-                            navCenter.classList.remove('active');
-                            document.body.classList.remove('nav-open');
-                        }
-                    });
-                    
-                    console.log('Mobile navigation initialized successfully for subject detail page');
-                } else {
-                    console.error('Mobile navigation elements not found:', { hamburger: !!hamburger, navCenter: !!navCenter });
-                }
-            }, 300);
-            
             // Load subject data
             const urlParams = new URLSearchParams(window.location.search);
             const subject = urlParams.get('subject');
