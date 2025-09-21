@@ -204,15 +204,22 @@
 
         async function showChapterImages(chapterId, chapterTitle, subjectId) {
             try {
+                console.log('Loading chapter images for:', { chapterId, chapterTitle, subjectId });
+                
                 // Fetch fresh subject data to get chapter images
                 const response = await fetch(getApiUrl(`/subjects/${subjectId}`));
                 const subjectData = await response.json();
+                
+                console.log('Subject data loaded:', subjectData);
                 
                 const chapter = subjectData.chapters.find(ch => ch._id === chapterId);
                 if (!chapter) {
                     showNotification('Chapter not found', 'error');
                     return;
                 }
+                
+                console.log('Chapter found:', chapter);
+                console.log('Chapter images:', chapter.images);
                 
                 const modal = document.getElementById('imageModal');
                 const modalTitle = document.getElementById('modalTitle');
@@ -225,23 +232,50 @@
                         <div style="text-align: center; padding: 3rem; color: #666;">
                             <i class="fas fa-image" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
                             <p>No images uploaded for this chapter yet.</p>
+                            <button onclick="testImageUrls('${subjectId}')" class="btn btn-secondary" style="margin-top: 1rem;">
+                                <i class="fas fa-bug"></i> Debug Image URLs
+                            </button>
                         </div>
                     `;
                 } else {
                     modalBody.innerHTML = `
+                        <div style="background: #f8f9fa; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; border-left: 4px solid #007bff;">
+                            <h5 style="margin: 0 0 0.5rem 0; color: #007bff;">Debug Info</h5>
+                            <p style="margin: 0; font-size: 0.9rem; color: #666;">
+                                Subject ID: <code>${subjectId}</code><br>
+                                Chapter ID: <code>${chapterId}</code><br>
+                                Images Found: <strong>${chapter.images.length}</strong><br>
+                                API Base: <code>${getApiUrl('')}</code>
+                            </p>
+                        </div>
                         <div class="images-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                            ${chapter.images.map(image => `
+                            ${chapter.images.map(image => {
+                                const imageUrl = getApiUrl(`/files/${subjectId}/${image.filename}`);
+                                const staticUrl = getApiUrl(`/uploads/${subjectId}/${image.filename}`);
+                                console.log('Loading image:', imageUrl);
+                                console.log('Alternative static URL:', staticUrl);
+                                return `
                                 <div class="image-card" style="background: #f8f9fa; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                                    <img src="${getApiUrl(`/files/${subjectId}/${image.filename}`)}" 
-                                         alt="${image.originalname}" 
-                                         style="width: 100%; height: 200px; object-fit: cover; cursor: pointer;"
-                                         onclick="openImageFullscreen('${getApiUrl(`/files/${subjectId}/${image.filename}`)}', '${image.originalname}')">
+                                    <div style="width: 100%; height: 200px; background: #e9ecef; display: flex; align-items: center; justify-content: center; position: relative;">
+                                        <img src="${imageUrl}" 
+                                             alt="${image.originalname}" 
+                                             style="width: 100%; height: 100%; object-fit: cover; cursor: pointer; opacity: 0; transition: opacity 0.3s ease;"
+                                             onclick="openImageFullscreen('${imageUrl}', '${image.originalname}')"
+                                             onload="this.style.opacity = '1';"
+                                             onerror="console.log('Primary image failed, trying static URL'); this.src = '${staticUrl}'; this.onerror = function() { this.style.display = 'none'; this.nextElementSibling.style.display = 'flex'; };">
+                                        <div style="display: none; flex-direction: column; align-items: center; justify-content: center; color: #666; text-align: center; position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+                                            <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                                            <p style="margin: 0; font-size: 0.9rem;">Image failed to load</p>
+                                            <small style="font-size: 0.8rem;">${image.filename}</small>
+                                        </div>
+                                    </div>
                                     <div style="padding: 1rem;">
                                         <p style="margin: 0; font-weight: 500; font-size: 0.9rem;">${image.originalname}</p>
                                         <small style="color: #666;">Uploaded ${new Date(image.uploadedAt).toLocaleDateString()}</small>
+                                        <br><small style="color: #888; font-family: monospace; font-size: 0.7rem;">${image.filename}</small>
                                     </div>
                                 </div>
-                            `).join('')}
+                            `;}).join('')}
                         </div>
                         ${chapter.pdfs && chapter.pdfs.length > 0 ? `
                             <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #e9ecef;">
@@ -288,6 +322,29 @@
             const modal = document.getElementById('imageModal');
             if (event.target === modal) {
                 closeImageModal();
+            }
+        }
+        
+        // Debug function to test image URLs
+        async function testImageUrls(subjectId) {
+            try {
+                const testUrl = getApiUrl('/health');
+                console.log('Testing API connection:', testUrl);
+                
+                const healthResponse = await fetch(testUrl);
+                console.log('Health check response:', healthResponse.status);
+                
+                const fileTestUrl = getApiUrl(`/files/${subjectId}/test.jpg`);
+                console.log('Testing file URL:', fileTestUrl);
+                
+                const fileResponse = await fetch(fileTestUrl);
+                console.log('File test response:', fileResponse.status);
+                
+                alert(`API Health: ${healthResponse.status}\\nFile Test: ${fileResponse.status}\\nCheck console for details`);
+                
+            } catch (error) {
+                console.error('Debug test error:', error);
+                alert('Debug test failed: ' + error.message);
             }
         }
 
