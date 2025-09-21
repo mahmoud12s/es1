@@ -75,11 +75,11 @@
                 </div>
                 <div style="text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 8px; min-width: 150px;">
                     <div style="font-size: 2rem; font-weight: 700; color: #000;" id="totalLessons">0</div>
-                    <div style="color: #666;">Total Lessons</div>
+                    <div style="color: #666;">Total Images</div>
                 </div>
                 <div style="text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 8px; min-width: 150px;">
                     <div style="font-size: 2rem; font-weight: 700; color: #000;" id="estimatedDuration">0</div>
-                    <div style="color: #666;">Weeks</div>
+                    <div style="color: #666;">Total PDFs</div>
                 </div>
             </div>
 
@@ -90,6 +90,19 @@
             </div>
         </div>
     </section>
+
+    <!-- Image Modal -->
+    <div id="imageModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Chapter Images</h3>
+                <span class="close" onclick="closeImageModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Images will be loaded here -->
+            </div>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="footer">
@@ -134,12 +147,12 @@
                 document.getElementById('currentSubject').textContent = subjectData.name;
 
                 // Calculate and display stats
-                const totalLessons = subjectData.chapters.reduce((total, chapter) => total + (chapter.lessons || 0), 0);
-                const totalWeeks = Math.ceil(totalLessons / 3); // Estimate 3 lessons per week
+                const totalImages = subjectData.chapters.reduce((total, chapter) => total + (chapter.images?.length || 0), 0);
+                const totalPDFs = subjectData.chapters.reduce((total, chapter) => total + (chapter.pdfs?.length || 0), 0);
                 
                 document.getElementById('totalChapters').textContent = subjectData.chapters.length;
-                document.getElementById('totalLessons').textContent = totalLessons;
-                document.getElementById('estimatedDuration').textContent = totalWeeks;
+                document.getElementById('totalLessons').textContent = totalImages;
+                document.getElementById('estimatedDuration').textContent = totalPDFs;
 
                 // Load chapters
                 displayChapters(subjectData.chapters, subject);
@@ -160,29 +173,27 @@
             chapters.forEach((chapter, index) => {
                 const chapterCard = document.createElement('div');
                 chapterCard.className = 'chapter-card';
-                chapterCard.setAttribute('data-chapter-id', chapter.id);
+                chapterCard.setAttribute('data-chapter-id', chapter._id);
                 
-                // Add progress indicator (mock data)
-                const progress = Math.floor(Math.random() * 100);
-                const progressColor = progress >= 80 ? '#28a745' : progress >= 50 ? '#ffc107' : '#dc3545';
+                const imageCount = chapter.images?.length || 0;
+                const pdfCount = chapter.pdfs?.length || 0;
                 
                 chapterCard.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
                         <h3>Chapter ${index + 1}: ${chapter.title}</h3>
-                        <div style="text-align: right;">
-                            <div style="width: 50px; height: 50px; border-radius: 50%; background: conic-gradient(${progressColor} ${progress * 3.6}deg, #e9ecef 0deg); display: flex; align-items: center; justify-content: center; position: relative;">
-                                <div style="width: 35px; height: 35px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 600;">${progress}%</div>
+                        <div style="text-align: right; display: flex; gap: 0.5rem;">
+                            <div style="background: #28a745; color: white; padding: 0.25rem 0.5rem; border-radius: 15px; font-size: 0.8rem;">
+                                <i class="fas fa-image"></i> ${imageCount}
+                            </div>
+                            <div style="background: #dc3545; color: white; padding: 0.25rem 0.5rem; border-radius: 15px; font-size: 0.8rem;">
+                                <i class="fas fa-file-pdf"></i> ${pdfCount}
                             </div>
                         </div>
                     </div>
-                    <p>${chapter.description}</p>
-                    <div class="chapter-stats">
-                        <span><i class="fas fa-book"></i> ${chapter.lessons} lessons</span>
-                        <span><i class="fas fa-clock"></i> ${chapter.duration}</span>
-                    </div>
+                    <p>${chapter.description || 'No description available'}</p>
                     <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e9ecef;">
-                        <button onclick="viewChapter('${subject}', ${chapter.id})" class="btn btn-primary" style="width: 100%;">
-                            <i class="fas fa-play"></i> Start Chapter
+                        <button onclick="showChapterImages('${chapter._id}', '${chapter.title}', '${subject}')" class="btn btn-primary" style="width: 100%;">
+                            <i class="fas fa-images"></i> View Chapter Images (${imageCount})
                         </button>
                     </div>
                 `;
@@ -191,8 +202,93 @@
             });
         }
 
-        function viewChapter(subject, chapterId) {
-            window.location.href = `chapter-detail.html?subject=${subject}&chapter=${chapterId}`;
+        async function showChapterImages(chapterId, chapterTitle, subjectId) {
+            try {
+                // Fetch fresh subject data to get chapter images
+                const response = await fetch(getApiUrl(`/subjects/${subjectId}`));
+                const subjectData = await response.json();
+                
+                const chapter = subjectData.chapters.find(ch => ch._id === chapterId);
+                if (!chapter) {
+                    showNotification('Chapter not found', 'error');
+                    return;
+                }
+                
+                const modal = document.getElementById('imageModal');
+                const modalTitle = document.getElementById('modalTitle');
+                const modalBody = document.getElementById('modalBody');
+                
+                modalTitle.textContent = `${chapterTitle} - Images`;
+                
+                if (!chapter.images || chapter.images.length === 0) {
+                    modalBody.innerHTML = `
+                        <div style="text-align: center; padding: 3rem; color: #666;">
+                            <i class="fas fa-image" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                            <p>No images uploaded for this chapter yet.</p>
+                        </div>
+                    `;
+                } else {
+                    modalBody.innerHTML = `
+                        <div class="images-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                            ${chapter.images.map(image => `
+                                <div class="image-card" style="background: #f8f9fa; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                    <img src="${getApiUrl(`/files/${subjectId}/${image.filename}`)}" 
+                                         alt="${image.originalname}" 
+                                         style="width: 100%; height: 200px; object-fit: cover; cursor: pointer;"
+                                         onclick="openImageFullscreen('${getApiUrl(`/files/${subjectId}/${image.filename}`)}', '${image.originalname}')">
+                                    <div style="padding: 1rem;">
+                                        <p style="margin: 0; font-weight: 500; font-size: 0.9rem;">${image.originalname}</p>
+                                        <small style="color: #666;">Uploaded ${new Date(image.uploadedAt).toLocaleDateString()}</small>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        ${chapter.pdfs && chapter.pdfs.length > 0 ? `
+                            <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #e9ecef;">
+                                <h4 style="margin-bottom: 1rem; color: #000;">PDF Files (${chapter.pdfs.length})</h4>
+                                <div class="pdfs-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                                    ${chapter.pdfs.map(pdf => `
+                                        <div class="pdf-card" style="background: #f8f9fa; border-radius: 8px; padding: 1rem; border-left: 4px solid #dc3545;">
+                                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                                <i class="fas fa-file-pdf" style="color: #dc3545; font-size: 1.2rem;"></i>
+                                                <span style="font-weight: 500; font-size: 0.9rem;">${pdf.originalname}</span>
+                                            </div>
+                                            <small style="color: #666; display: block; margin-bottom: 0.5rem;">Uploaded ${new Date(pdf.uploadedAt).toLocaleDateString()}</small>
+                                            <button onclick="window.open('${getApiUrl(`/files/${subjectId}/${pdf.filename}`)}', '_blank')" 
+                                                    class="btn btn-sm" 
+                                                    style="background: #dc3545; color: white; padding: 0.25rem 0.5rem; border: none; border-radius: 4px; cursor: pointer;">
+                                                <i class="fas fa-eye"></i> View PDF
+                                            </button>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                    `;
+                }
+                
+                modal.style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error loading chapter images:', error);
+                showNotification('Error loading chapter images', 'error');
+            }
+        }
+        
+        function closeImageModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+        
+        function openImageFullscreen(imageUrl, imageName) {
+            window.open(imageUrl, '_blank');
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('imageModal');
+            if (event.target === modal) {
+                closeImageModal();
+            }
         }
 
         // Enhanced subject data with more subjects

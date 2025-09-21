@@ -144,16 +144,6 @@
                             <label>Description</label>
                             <textarea name="description" rows="3" placeholder="Brief description of the chapter"></textarea>
                         </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Number of Lessons</label>
-                                <input type="number" name="lessons" min="1" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Duration</label>
-                                <input type="text" name="duration" placeholder="e.g., 2 weeks" required>
-                            </div>
-                        </div>
                         <button type="submit" class="btn btn-primary">Add Chapter</button>
                     </form>
                 </div>
@@ -501,6 +491,11 @@
                 if (response.ok) {
                     this.reset();
                     showNotification('Subject added successfully!', 'success');
+                    // Clear cache to update main page
+                    if (typeof DataStore !== 'undefined') {
+                        DataStore.clear('subjects');
+                    }
+                    localStorage.removeItem('es1_cache_subjects');
                     loadSubjectsForAdmin(); // Reload subjects
                 } else {
                     console.error('Subject error response:', responseData);
@@ -529,9 +524,7 @@
                     },
                     body: JSON.stringify({
                         title: formData.get('title'),
-                        description: formData.get('description'),
-                        lessons: formData.get('lessons'),
-                        duration: formData.get('duration')
+                        description: formData.get('description')
                     })
                 });
                 
@@ -810,6 +803,11 @@
                     
                     if (response.ok) {
                         showNotification('Subject deleted successfully!', 'success');
+                        // Clear cache to update main page
+                        if (typeof DataStore !== 'undefined') {
+                            DataStore.clear('subjects');
+                        }
+                        localStorage.removeItem('es1_cache_subjects');
                         loadSubjectsForAdmin(); // Reload subjects
                     } else {
                         const errorData = await response.json().catch(() => ({}));
