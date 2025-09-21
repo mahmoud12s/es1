@@ -11,11 +11,24 @@ const CONFIG = {
             return 'http://localhost:2092/api';
         }
         
-        // Production - Railway HTTPS backend (no mixed content issues!)
+        // Production - Check if backend has custom domain or use Railway
+        // If your backend is also on a custom domain, replace the URL below
+        if (hostname === 'lodes1b.thteam.me') {
+            // Option 1: If backend is on same domain with different port/path
+            // return 'https://lodes1b.thteam.me:2092/api';
+            
+            // Option 2: If backend is on different subdomain
+            // return 'https://api.lodes1b.thteam.me/api';
+            
+            // Option 3: If backend is still on Railway (current setup)
+            return 'https://serverjs-production-0592.up.railway.app/api';
+        }
+        
+        // Fallback for other domains
         return 'https://serverjs-production-0592.up.railway.app/api';
     })(),
     
-    // Railway backend URL (HTTPS enabled)
+    // Railway backend API URL (HTTPS enabled) 
     RAILWAY_API_URL: 'https://serverjs-production-0592.up.railway.app/api',
     
     // Application Settings
