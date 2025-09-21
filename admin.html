@@ -521,7 +521,7 @@
                 const token = localStorage.getItem('userToken');
                 const subjectId = formData.get('subject');
                 
-                const response = await fetch(`/api/subjects/${subjectId}/chapters`, {
+                const response = await fetch(getApiUrl(`/subjects/${subjectId}/chapters`), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -645,7 +645,7 @@
                     
                     if (homeworkId) {
                         const token = localStorage.getItem('userToken');
-                        const response = await fetch(`/api/homework/${homeworkId}`, {
+                        const response = await fetch(getApiUrl(`/homework/${homeworkId}`), {
                             method: 'DELETE',
                             headers: {
                                 'Authorization': `Bearer ${token}`
@@ -801,7 +801,7 @@
             if (confirm('Are you sure you want to delete this subject? This will also delete all its chapters.')) {
                 try {
                     const token = localStorage.getItem('userToken');
-                    const response = await fetch(`/api/subjects/${subjectId}`, {
+                    const response = await fetch(getApiUrl(`/subjects/${subjectId}`), {
                         method: 'DELETE',
                         headers: {
                             'Authorization': `Bearer ${token}`
@@ -812,9 +812,11 @@
                         showNotification('Subject deleted successfully!', 'success');
                         loadSubjectsForAdmin(); // Reload subjects
                     } else {
-                        showNotification('Error deleting subject', 'error');
+                        const errorData = await response.json().catch(() => ({}));
+                        showNotification(errorData.message || 'Error deleting subject', 'error');
                     }
                 } catch (error) {
+                    console.error('Delete subject error:', error);
                     showNotification('Error deleting subject', 'error');
                 }
             }
@@ -825,7 +827,7 @@
             if (confirm('Are you sure you want to delete this chapter?')) {
                 try {
                     const token = localStorage.getItem('userToken');
-                    const response = await fetch(`/api/subjects/${subjectId}/chapters/${chapterId}`, {
+                    const response = await fetch(getApiUrl(`/subjects/${subjectId}/chapters/${chapterId}`), {
                         method: 'DELETE',
                         headers: {
                             'Authorization': `Bearer ${token}`
@@ -836,9 +838,11 @@
                         showNotification('Chapter deleted successfully!', 'success');
                         loadSubjectsForAdmin(); // Reload subjects
                     } else {
-                        showNotification('Error deleting chapter', 'error');
+                        const errorData = await response.json().catch(() => ({}));
+                        showNotification(errorData.message || 'Error deleting chapter', 'error');
                     }
                 } catch (error) {
+                    console.error('Delete chapter error:', error);
                     showNotification('Error deleting chapter', 'error');
                 }
             }
