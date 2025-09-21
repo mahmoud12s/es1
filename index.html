@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ES1 Class Organization</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -20,15 +20,15 @@
                     <li class="nav-item">
                         <a href="#home" class="nav-link active" data-text="navHome">Home</a>
                     </li>
-                    <li class="nav-item">
-                        <a href="#schedule" class="nav-link" data-text="navSchedule">Weekly Program</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#subjects" class="nav-link" data-text="navSubjects">Subjects</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#agenda" class="nav-link" data-text="navAgenda">Agenda</a>
-                    </li>
+                <li class="nav-item">
+                    <a href="schedule.html" class="nav-link" data-text="navSchedule">Weekly Program</a>
+                </li>
+                <li class="nav-item">
+                    <a href="subjects.html" class="nav-link" data-text="navSubjects">Subjects</a>
+                </li>
+                <li class="nav-item">
+                    <a href="agenda.html" class="nav-link" data-text="navAgenda">Agenda</a>
+                </li>
                     <li class="nav-item">
                         <a href="login.html" class="nav-link" data-text="navAdminLogin">Admin Login</a>
                     </li>
@@ -55,49 +55,43 @@
             <h1 data-text="heroTitle">Welcome to ES1 Class Organization</h1>
             <p data-text="heroSubtitle">Your complete learning management system</p>
             <div class="hero-buttons">
-                <a href="#schedule" class="btn btn-primary" data-text="heroViewSchedule">View Schedule</a>
-                <a href="#subjects" class="btn btn-secondary" data-text="heroBrowseSubjects">Browse Subjects</a>
+                <a href="schedule.html" class="btn btn-primary" data-text="heroViewSchedule">View Schedule</a>
+                <a href="subjects.html" class="btn btn-secondary" data-text="heroBrowseSubjects">Browse Subjects</a>
+                <a href="agenda.html" class="btn btn-secondary" data-text="navAgenda">View Agenda</a>
             </div>
         </div>
     </section>
 
-    <!-- Weekly Program Section -->
-    <section id="schedule" class="schedule-section">
+    <!-- Quick Access Section -->
+    <section class="quick-access-section" style="padding: 80px 0; background-color: #f8f9fa;">
         <div class="container">
-            <h2 class="section-title" data-text="sectionSchedule">Weekly Program</h2>
-            <div class="schedule-grid" id="scheduleContainer">
-                <!-- Schedule will be loaded dynamically from database -->
-                <div class="empty-message" style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: #666;">
-                    <i class="fas fa-calendar-alt" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
-                    <p data-text="emptySchedule">No schedule available yet. Admin can add classes through the admin panel.</p>
+            <h2 class="section-title" style="margin-bottom: 3rem;">Quick Access</h2>
+            <div class="quick-access-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                <div class="access-card" style="background: #ffffff; border-radius: 12px; padding: 2rem; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.3s ease;">
+                    <div class="card-icon" style="font-size: 3rem; color: #000000; margin-bottom: 1rem;">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <h3 style="color: #000000; margin-bottom: 1rem;" data-text="sectionSchedule">Weekly Program</h3>
+                    <p style="color: #666; margin-bottom: 2rem;">View your complete weekly class schedule</p>
+                    <a href="schedule.html" class="btn btn-primary" style="width: 100%;" data-text="heroViewSchedule">View Schedule</a>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Subjects Section -->
-    <section id="subjects" class="subjects-section">
-        <div class="container">
-            <h2 class="section-title" data-text="sectionSubjects">Subjects</h2>
-            <div class="subjects-grid" id="subjectsContainer">
-                <!-- Subjects will be loaded dynamically from database -->
-                <div class="empty-message" style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: #666;">
-                    <i class="fas fa-book-open" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
-                    <p data-text="emptySubjects">No subjects available yet. Admin can add subjects through the admin panel.</p>
+                
+                <div class="access-card" style="background: #ffffff; border-radius: 12px; padding: 2rem; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.3s ease;">
+                    <div class="card-icon" style="font-size: 3rem; color: #000000; margin-bottom: 1rem;">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <h3 style="color: #000000; margin-bottom: 1rem;" data-text="sectionSubjects">Subjects</h3>
+                    <p style="color: #666; margin-bottom: 2rem;">Browse all subjects and their chapters</p>
+                    <a href="subjects.html" class="btn btn-primary" style="width: 100%;" data-text="heroBrowseSubjects">Browse Subjects</a>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Homework Agenda Section -->
-    <section id="agenda" class="agenda-section">
-        <div class="container">
-            <h2 class="section-title" data-text="sectionAgenda">Homework Agenda</h2>
-            <div class="agenda-grid" id="agendaContainer">
-                <!-- Homework assignments will be loaded dynamically from database -->
-                <div class="empty-message" style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: #666;">
-                    <i class="fas fa-tasks" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.3;"></i>
-                    <p data-text="emptyHomework">No homework assignments available yet. Admin can add homework through the admin panel.</p>
+                
+                <div class="access-card" style="background: #ffffff; border-radius: 12px; padding: 2rem; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.3s ease;">
+                    <div class="card-icon" style="font-size: 3rem; color: #000000; margin-bottom: 1rem;">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <h3 style="color: #000000; margin-bottom: 1rem;" data-text="sectionAgenda">Homework Agenda</h3>
+                    <p style="color: #666; margin-bottom: 2rem;">Check your homework assignments</p>
+                    <a href="agenda.html" class="btn btn-primary" style="width: 100%;" data-text="navAgenda">View Agenda</a>
                 </div>
             </div>
         </div>

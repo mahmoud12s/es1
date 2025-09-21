@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Admin Login - ES1 Class</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -19,12 +19,19 @@
             <form id="loginForm" class="login-form">
                 <div class="form-group">
                     <label for="username" data-text="loginUsername">Username</label>
-                    <input type="text" id="username" name="username" required data-placeholder="loginUsername">
+                    <input type="text" id="username" name="username" required 
+                           data-placeholder="loginUsername" 
+                           autocomplete="username" 
+                           autocapitalize="none" 
+                           autocorrect="off" 
+                           spellcheck="false">
                 </div>
                 
                 <div class="form-group">
                     <label for="password" data-text="loginPassword">Password</label>
-                    <input type="password" id="password" name="password" required data-placeholder="loginPassword">
+                    <input type="password" id="password" name="password" required 
+                           data-placeholder="loginPassword" 
+                           autocomplete="current-password">
                 </div>
                 
                 <button type="submit" class="login-btn">
@@ -48,11 +55,17 @@
     <script src="config.js"></script>
     <script src="script.js"></script>
     <script>
-        // Enhanced login handling with real API
+        // Enhanced login handling with mobile support
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const username = document.getElementById('username').value;
+            // Disable form during submission
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span data-text="loginButton">Logging in...</span>';
+            
+            const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
             
             console.log('Attempting login for user:', username);
@@ -93,20 +106,30 @@
                         username: localStorage.getItem('username')
                     });
                     
-                    showNotification('Login successful!', 'success');
+                    showNotification(getText('msgLoginSuccess'), 'success');
                     
                     setTimeout(() => {
                         window.location.href = 'admin.html';
                     }, 1000);
                     
                 } else {
-                    const errorData = await response.json();
+                    const errorData = await response.json().catch(() => ({ message: 'Invalid credentials' }));
                     console.error('Login failed:', errorData);
-                    showNotification(errorData.message || 'Invalid credentials', 'error');
+                    showNotification(errorData.message || getText('msgInvalidCredentials'), 'error');
                 }
             } catch (error) {
                 console.error('Login error:', error);
-                showNotification('Login failed. Please try again.', 'error');
+                
+                // Better error messages for mobile
+                if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
+                    showNotification('Cannot connect to server. Please check your internet connection.', 'error');
+                } else {
+                    showNotification('Login failed. Please try again.', 'error');
+                }
+            } finally {
+                // Re-enable form
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
             }
         });
     </script>

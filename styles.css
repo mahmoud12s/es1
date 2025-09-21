@@ -10,6 +10,12 @@ body {
     line-height: 1.6;
     color: #333;
     background-color: #ffffff;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body.nav-open {
+    overflow: hidden;
 }
 
 .container {
@@ -129,6 +135,15 @@ body {
     border: none;
     cursor: pointer;
     display: inline-block;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 .btn-primary {
@@ -236,6 +251,9 @@ body {
     transition: all 0.3s ease;
     cursor: pointer;
     border: 2px solid transparent;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
 }
 
 .subject-card:hover {
@@ -446,6 +464,8 @@ body {
     border-radius: 8px;
     font-size: 1rem;
     transition: border-color 0.3s ease;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 .form-group input:focus {
@@ -455,15 +475,17 @@ body {
 
 .login-btn {
     width: 100%;
-    padding: 12px;
+    padding: 15px 12px;
     background-color: #000000;
     color: #ffffff;
     border: none;
     border-radius: 8px;
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .login-btn:hover {
@@ -861,6 +883,32 @@ body {
     overflow-y: auto;
 }
 
+/* Quick Access Cards */
+.access-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+/* Page Headers */
+.page-header h1 {
+    margin-bottom: 1rem;
+}
+
+.page-header p {
+    margin-bottom: 0;
+}
+
+/* Loading Animations */
+.loading-message {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+}
+
 /* Language Toggle */
 .nav-language {
     display: flex;
@@ -895,10 +943,13 @@ body {
         flex-direction: column;
         background-color: #000000;
         width: 100%;
+        height: calc(100vh - 70px);
         text-align: center;
-        transition: 0.3s;
+        transition: left 0.3s ease;
         padding: 2rem 0;
         justify-content: flex-start;
+        z-index: 1000;
+        overflow-y: auto;
     }
     
     .nav-center.active {
@@ -915,8 +966,15 @@ body {
     }
     
     .nav-right {
-        flex-direction: column;
+        flex-direction: row;
         gap: 0.5rem;
+        position: relative;
+        z-index: 1001;
+    }
+    
+    .nav-language .btn {
+        padding: 6px 12px;
+        font-size: 0.9rem;
     }
     
     .hero-content h1 {
@@ -974,5 +1032,42 @@ body {
     
     .login-card {
         padding: 2rem;
+        margin: 1rem;
+    }
+    
+    .form-group input {
+        padding: 15px 16px;
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    .login-btn {
+        padding: 18px 12px;
+        font-size: 1.2rem;
+    }
+    
+    .subject-card {
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 5% auto;
+        max-height: 85vh;
+    }
+    
+    .modal-body {
+        padding: 1rem;
+        max-height: 60vh;
+    }
+    
+    .images-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+        gap: 0.5rem !important;
+    }
+    
+    .access-card {
+        padding: 1.5rem !important;
+        margin-bottom: 1rem;
     }
 }
