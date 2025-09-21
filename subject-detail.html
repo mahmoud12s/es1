@@ -8,7 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="languages.js"></script>
     <script src="config.js"></script>
-    <script src="mobile-nav.js"></script>
+    <script src="mobile-nav-fix.js"></script>
 </head>
 <body>
     <!-- Navigation -->
@@ -121,6 +121,46 @@
         // Load subject details when page loads
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Subject detail page loaded');
+            
+            // FORCE mobile navigation to work
+            setTimeout(function() {
+                console.log('🔧 SUBJECT-DETAIL: Force mobile nav setup');
+                const hamburger = document.querySelector('.hamburger');
+                const navCenter = document.querySelector('.nav-center');
+                
+                if (hamburger && navCenter) {
+                    console.log('🔧 SUBJECT-DETAIL: Elements found, setting up click handler');
+                    
+                    // Remove any existing listeners
+                    hamburger.onclick = null;
+                    
+                    function handleClick(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('🔧 SUBJECT-DETAIL: Hamburger clicked!');
+                        
+                        const isActive = hamburger.classList.contains('active');
+                        if (isActive) {
+                            hamburger.classList.remove('active');
+                            navCenter.classList.remove('active');
+                            document.body.classList.remove('nav-open');
+                            console.log('🔧 SUBJECT-DETAIL: Menu CLOSED');
+                        } else {
+                            hamburger.classList.add('active');
+                            navCenter.classList.add('active');
+                            document.body.classList.add('nav-open');
+                            console.log('🔧 SUBJECT-DETAIL: Menu OPENED');
+                        }
+                    }
+                    
+                    hamburger.addEventListener('click', handleClick);
+                    hamburger.addEventListener('touchstart', handleClick);
+                    
+                    console.log('🔧 SUBJECT-DETAIL: Mobile nav setup complete');
+                } else {
+                    console.error('🔧 SUBJECT-DETAIL: Elements not found!', {hamburger: !!hamburger, navCenter: !!navCenter});
+                }
+            }, 500);
             
             // Load subject data
             const urlParams = new URLSearchParams(window.location.search);

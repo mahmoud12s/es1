@@ -1,10 +1,12 @@
-// Mobile Navigation - Enhanced and Robust
+// Mobile Navigation - FORCE INITIALIZATION
 (function() {
     'use strict';
     
+    console.log('🔧 MOBILE NAV: Script loaded');
+    
     let initialized = false;
     let retryCount = 0;
-    const maxRetries = 10;
+    const maxRetries = 20;
     
     function initMobileNavigation() {
         if (initialized) {
@@ -122,20 +124,43 @@
         }, 100);
     }
     
-    // Multiple initialization strategies
+    // AGGRESSIVE initialization strategies
+    console.log('🔧 MOBILE NAV: Setting up initialization');
+    
+    // Strategy 1: Immediate if DOM ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(initMobileNavigation, 100);
+            console.log('🔧 MOBILE NAV: DOM loaded, initializing...');
+            setTimeout(initMobileNavigation, 50);
+            setTimeout(initMobileNavigation, 200);
+            setTimeout(initMobileNavigation, 500);
         });
     } else {
-        setTimeout(initMobileNavigation, 100);
+        console.log('🔧 MOBILE NAV: DOM already loaded, initializing immediately...');
+        setTimeout(initMobileNavigation, 50);
+        setTimeout(initMobileNavigation, 200);
     }
     
+    // Strategy 2: Window load
     window.addEventListener('load', function() {
+        console.log('🔧 MOBILE NAV: Window loaded');
         if (!initialized) {
             setTimeout(initMobileNavigation, 100);
+            setTimeout(initMobileNavigation, 300);
         }
     });
+    
+    // Strategy 3: Force retry every 2 seconds for first 10 seconds
+    let forceRetryCount = 0;
+    const forceInterval = setInterval(function() {
+        if (!initialized && forceRetryCount < 5) {
+            console.log('🔧 MOBILE NAV: Force retry', forceRetryCount + 1);
+            initMobileNavigation();
+            forceRetryCount++;
+        } else {
+            clearInterval(forceInterval);
+        }
+    }, 2000);
     
     // Expose for manual testing
     window.testMobileNav = function() {

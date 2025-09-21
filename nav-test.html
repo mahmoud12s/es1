@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mobile Nav Test - ES1 Class</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="mobile-nav-fix.js"></script>
+    <style>
+        .test-container {
+            padding: 120px 20px 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            margin: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .status {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #007bff;
+        }
+        .hamburger {
+            border: 3px solid #ff0000 !important;
+            background: rgba(255,0,0,0.2) !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2>ES1 Class - NAV TEST</h2>
+            </div>
+            <div class="nav-center">
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="schedule.html" class="nav-link">Weekly Program</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="subjects.html" class="nav-link active">Subjects</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="agenda.html" class="nav-link">Agenda</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="login.html" class="nav-link">Admin Login</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="nav-right">
+                <div class="nav-language">
+                    <button id="languageToggle" class="btn btn-secondary" style="padding: 8px 16px;">
+                        <i class="fas fa-language"></i> <span id="currentLang">EN</span>
+                    </button>
+                </div>
+                <div class="hamburger">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="test-container">
+        <h1>🔧 Mobile Navigation Test Page</h1>
+        
+        <div class="status">
+            <h3>📱 Instructions:</h3>
+            <ol>
+                <li><strong>Resize browser</strong> to mobile width (&lt; 768px) or use mobile device</li>
+                <li><strong>Look for hamburger menu</strong> (☰) with RED BORDER in top-right</li>
+                <li><strong>Open browser console</strong> (F12 → Console tab)</li>
+                <li><strong>Click hamburger menu</strong> and watch console messages</li>
+                <li><strong>Menu should slide in</strong> from left side</li>
+            </ol>
+        </div>
+        
+        <div class="status">
+            <h3>🧪 Test Buttons:</h3>
+            <button class="test-button" onclick="window.testUltimateMobileNav()">
+                🎯 Test Mobile Nav
+            </button>
+            <button class="test-button" onclick="console.clear(); console.log('Console cleared. Try clicking hamburger now.')">
+                🧹 Clear Console
+            </button>
+            <button class="test-button" onclick="location.reload()">
+                🔄 Reload Page
+            </button>
+        </div>
+        
+        <div class="status">
+            <h3>✅ Expected Console Output:</h3>
+            <pre style="background: #000; color: #0f0; padding: 15px; border-radius: 5px; overflow-x: auto; font-size: 12px;">
+🚀 ULTIMATE MOBILE NAV FIX: Loading...
+🚀 Setting up initialization strategies...
+🚀 DOM loaded, initializing...
+🚀 Attempting ultimate mobile nav fix...
+🚀 Elements check: {hamburger: true, navCenter: true, hamburgerVisible: "flex", screenWidth: 375}
+🚀 ✅ ULTIMATE MOBILE NAV FIX COMPLETE!
+🚀 HAMBURGER CLICKED!
+🚀 MENU OPENED ✅
+            </pre>
+        </div>
+        
+        <div class="status">
+            <h3>📋 Current Status:</h3>
+            <div id="live-status">Loading...</div>
+        </div>
+    </div>
+
+    <script>
+        // Live status updater
+        function updateStatus() {
+            const hamburger = document.querySelector('.hamburger');
+            const navCenter = document.querySelector('.nav-center');
+            const screenWidth = window.innerWidth;
+            
+            const status = document.getElementById('live-status');
+            status.innerHTML = `
+                <div><strong>Screen Width:</strong> ${screenWidth}px ${screenWidth <= 768 ? '(Mobile Mode)' : '(Desktop Mode)'}</div>
+                <div><strong>Hamburger Found:</strong> ${hamburger ? '✅ YES' : '❌ NO'}</div>
+                <div><strong>Nav Center Found:</strong> ${navCenter ? '✅ YES' : '❌ NO'}</div>
+                <div><strong>Mobile Nav Fixed:</strong> ${window.mobileNavFixed ? '✅ YES' : '❌ NO'}</div>
+                ${hamburger ? `<div><strong>Hamburger Display:</strong> ${window.getComputedStyle(hamburger).display}</div>` : ''}
+                ${hamburger ? `<div><strong>Hamburger Active:</strong> ${hamburger.classList.contains('active') ? '✅ YES' : '❌ NO'}</div>` : ''}
+                ${navCenter ? `<div><strong>Nav Center Active:</strong> ${navCenter.classList.contains('active') ? '✅ YES' : '❌ NO'}</div>` : ''}
+            `;
+        }
+        
+        setInterval(updateStatus, 1000);
+        window.addEventListener('resize', updateStatus);
+        setTimeout(updateStatus, 500);
+    </script>
+</body>
+</html>
