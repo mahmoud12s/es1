@@ -246,7 +246,7 @@ const LANGUAGES = {
         roleStudent: 'Étudiant',
         
         // Footer
-        footerCopyright: 'MADE/POWERED BY MAHMOUD',
+        footerCopyright: 'MADE/POWERED BY MAHMOUD pierre on topp',
         
         // Chapters
         chaptersTitle: 'Chapitres',
